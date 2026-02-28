@@ -12,11 +12,11 @@ Imports:
     config (>= 0.3.2),
     DBI,
     duckdb,
+    ggiraph,
     ggplot2,
     glue,
     golem,
     htmltools,
-    plotly,
     reactable,
     shiny
 Suggests: 

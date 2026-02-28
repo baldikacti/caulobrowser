@@ -7,7 +7,7 @@
 
 #' Plot time-resolved expression profiles
 #'
-#' Creates a plotly line chart showing gene expression across cell cycle
+#' Creates a ggiraph line chart showing gene expression across cell cycle
 #' timepoints. Each gene is a separate colored trace. Facets by experiment type
 #' if multiple are present.
 #'
@@ -15,18 +15,13 @@
 #'   Expected columns: gene_name, timepoint_minutes, expression_value,
 #'   experiment_type, experiment_label
 #' @param color_palette Named character vector mapping gene_name to hex color.
-#' @return A plotly object.
+#' @return A girafe object.
 #' @noRd
 plot_expression_timecourse <- function(expression_df, color_palette = NULL) {
 
   if (is.null(expression_df) || nrow(expression_df) == 0) {
     return(
-      plotly::plot_ly() |>
-        plotly::layout(
-          title = "No expression data available",
-          xaxis = list(visible = FALSE),
-          yaxis = list(visible = FALSE)
-        )
+      ggiraph::girafe(ggobj = ggplot2::ggplot() + ggplot2::theme_void())
     )
   }
 
@@ -50,16 +45,21 @@ plot_expression_timecourse <- function(expression_df, color_palette = NULL) {
       x = timepoint_minutes,
       y = expression_value,
       color = gene_name,
-      group = gene_name,
-      text = paste0(
-        "Gene: ", gene_name, "\n",
-        "Time: ", timepoint_minutes, " min\n",
-        "Value: ", round(expression_value, 3)
-      )
+      group = gene_name
     )
   ) +
-    ggplot2::geom_line(linewidth = 1) +
-    ggplot2::geom_point(size = 2) +
+    ggiraph::geom_line_interactive(linewidth = 1) +
+    ggiraph::geom_point_interactive(
+      ggplot2::aes(
+        tooltip = paste0(
+          "Gene: ", gene_name, "\n",
+          "Time: ", timepoint_minutes, " min\n",
+          "Value: ", round(expression_value, 3)
+        ),
+        data_id = paste0(gene_name, "_", timepoint_minutes)
+      ),
+      size = 2
+    ) +
     ggplot2::facet_wrap(
       ~ experiment_type,
       scales = "free_y",
@@ -77,10 +77,10 @@ plot_expression_timecourse <- function(expression_df, color_palette = NULL) {
       legend.position = "bottom"
     )
 
-  plotly::ggplotly(p, tooltip = "text") |>
-    plotly::layout(
-      legend = list(orientation = "h", y = -0.15)
-    )
+  ggiraph::girafe(
+    ggobj = p,
+    options = list(ggiraph::opts_tooltip(use_fill = TRUE))
+  )
 }
 
 
@@ -91,22 +91,13 @@ plot_expression_timecourse <- function(expression_df, color_palette = NULL) {
 #' @param expression_df Data frame filtered to one experiment_type.
 #' @param title Character title for the plot.
 #' @param color_palette Named character vector mapping gene_name to hex color.
-#' @return A plotly object.
+#' @return A girafe object.
 #' @noRd
 plot_single_expression <- function(expression_df, title = "", color_palette = NULL) {
 
   if (is.null(expression_df) || nrow(expression_df) == 0) {
     return(
-      plotly::plot_ly() |>
-        plotly::layout(
-          title = title,
-          xaxis = list(visible = FALSE),
-          yaxis = list(visible = FALSE),
-          annotations = list(
-            text = "No data available for this experiment type",
-            showarrow = FALSE, font = list(size = 14)
-          )
-        )
+      ggiraph::girafe(ggobj = ggplot2::ggplot() + ggplot2::theme_void())
     )
   }
 
@@ -131,8 +122,18 @@ plot_single_expression <- function(expression_df, title = "", color_palette = NU
       group = gene_name
     )
   ) +
-    ggplot2::geom_line(linewidth = 1) +
-    ggplot2::geom_point(size = 2.5) +
+    ggiraph::geom_line_interactive(linewidth = 1) +
+    ggiraph::geom_point_interactive(
+      ggplot2::aes(
+        tooltip = paste0(
+          "Gene: ", gene_name, "\n",
+          "Time: ", timepoint_minutes, " min\n",
+          "Value: ", round(expression_value, 3)
+        ),
+        data_id = paste0(gene_name, "_", timepoint_minutes)
+      ),
+      size = 2.5
+    ) +
     ggplot2::scale_color_manual(values = color_palette) +
     ggplot2::labs(
       title = title,
@@ -143,10 +144,10 @@ plot_single_expression <- function(expression_df, title = "", color_palette = NU
     ggplot2::theme_minimal(base_size = 13) +
     ggplot2::theme(legend.position = "bottom")
 
-  plotly::ggplotly(p) |>
-    plotly::layout(
-      legend = list(orientation = "h", y = -0.2)
-    )
+  ggiraph::girafe(
+    ggobj = p,
+    options = list(ggiraph::opts_tooltip(use_fill = TRUE))
+  )
 }
 
 
