@@ -10,18 +10,20 @@ generate_example_database(
 )
 }
 \arguments{
-\item{path}{Path where the `.duckdb` file should be written.
-Defaults to `"caulobrowser_example.duckdb"` in the current working
-directory.}
+\item{path}{Path where the `.duckdb` file should be written, or `":memory:"`
+to create a transient in-memory database.  Defaults to
+`"caulobrowser_example.duckdb"` in the current working directory.}
 
 \item{overwrite}{Logical. If `TRUE` (default) an existing file at
-`path` is removed before creating the new database.}
+`path` is removed before creating the new database. Ignored when
+`path = ":memory:"`.}
 }
 \value{
-The resolved `path`, invisibly.
+When `path = ":memory:"`, the open `DBI` connection (caller is
+  responsible for closing it).  Otherwise the resolved `path`, invisibly.
 }
 \description{
-Creates a DuckDB database file pre-populated with demo data for five
+Creates a DuckDB database pre-populated with demo data for five
 *Caulobacter crescentus* NA1000 genes across two experiments: a
 cell-cycle RNA-seq timecourse and a CtrA-depletion DE comparison.
 }

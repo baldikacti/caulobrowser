@@ -2,6 +2,7 @@
 .Rhistory
 .git
 .gitignore
+.DS_Store
 manifest.json
 rsconnect/
 .Rproj.user

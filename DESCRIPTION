@@ -18,10 +18,11 @@ Imports:
     golem,
     htmltools,
     reactable,
-    shiny
+    shiny,
+    stats,
+    tools
 Suggests: 
     knitr,
-    rmarkdown,
     spelling,
     testthat (>= 3.0.0)
 VignetteBuilder: 
