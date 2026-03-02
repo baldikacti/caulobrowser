@@ -6,6 +6,9 @@ version := `Rscript -e "cat(read.dcf('DESCRIPTION')[,'Version'])"`
 build_r:
     R CMD build .
 
+build_readme:
+    Rscript -e "devtools::build_readme()"
+
 # Build base docker container
 build_docker_base: build_r
     docker build --platform linux/amd64,linux/arm64 -f Dockerfile_base -t baldikacti/caulobrowser_base:latest .
