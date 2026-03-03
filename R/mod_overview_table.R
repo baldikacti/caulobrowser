@@ -105,8 +105,6 @@ mod_overview_table_server <- function(id, gene_results, db_con) {
         stringsAsFactors = FALSE,
         check.names = FALSE
       )
-      idx <- is.na(genes$gene_name) | genes$gene_name == ""
-      genes$gene_name[idx] <- genes$gene_id[idx]
       colnames(overview_df) <- c("Category", genes$gene_name)
       rownames(overview_df) <- NULL
       overview_df
