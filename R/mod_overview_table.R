@@ -55,14 +55,18 @@ mod_overview_table_server <- function(id, gene_results, db_con) {
         }
       })
       rows[["UniProt"]] <- sapply(genes$gene_name, function(gn) {
-        ext_link(
-          paste0(
-            "https://www.uniprot.org/uniprotkb?query=",
-            gn,
-            "+AND+organism_id:565050"
-          ),
-          "Search UniProt"
-        )
+        if (missing_val(gn)) {
+          "—"
+        } else {
+          ext_link(
+            paste0(
+              "https://www.uniprot.org/uniprotkb?query=",
+              gn,
+              "+AND+organism_id:565050"
+            ),
+            "Search UniProt"
+          )
+        }
       })
 
       # ── Section: ADDITIONAL RESOURCES ──────────────────────────────────────
@@ -101,6 +105,8 @@ mod_overview_table_server <- function(id, gene_results, db_con) {
         stringsAsFactors = FALSE,
         check.names = FALSE
       )
+      idx <- is.na(genes$gene_name) | genes$gene_name == ""
+      genes$gene_name[idx] <- genes$gene_id[idx]
       colnames(overview_df) <- c("Category", genes$gene_name)
       rownames(overview_df) <- NULL
       overview_df
