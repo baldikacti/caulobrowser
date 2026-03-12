@@ -124,7 +124,7 @@ mod_de_heatmap_server <- function(id, gene_results, db_con) {
       row <- df[df$experiment_id == selected_id, ][1, ]
 
       doi_val <- row$doi
-      doi_cell <- if (!is.null(doi_val) && !is.na(doi_val) && nzchar(doi_val)) {
+      doi_cell <- if (is_present(doi_val)) {
         shiny::tags$a(
           href = paste0("https://doi.org/", doi_val),
           target = "_blank",

@@ -13,6 +13,15 @@ make_row <- function(label, value) {
   )
 }
 
+#' Test whether a scalar is non-NULL, non-NA, and non-empty
+#'
+#' @param x A scalar value to test.
+#' @return `TRUE` if `x` is non-`NULL`, non-`NA`, and has at least one character.
+#' @noRd
+is_present <- function(x) {
+  !is.null(x) && !is.na(x) && nzchar(x)
+}
+
 #' Return a value or a fallback if missing/empty
 #'
 #' Coalesces `NULL`, `NA`, and empty strings to `or` so UI cells
@@ -25,5 +34,5 @@ make_row <- function(label, value) {
 #' @return `x` if it is non-`NULL`, non-`NA`, and non-empty; otherwise `or`.
 #' @noRd
 na_or <- function(x, or = "\u2014") {
-  if (!is.null(x) && !is.na(x) && nzchar(x)) x else or
+  if (is_present(x)) x else or
 }
