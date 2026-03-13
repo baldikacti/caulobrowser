@@ -5,9 +5,15 @@ version := `Rscript -e "cat(read.dcf('DESCRIPTION')[,'Version'])"`
 # Compile R package into tar.gz
 build_r:
     R CMD build .
+    mv caulobrowser_{{version}}.tar.gz deploy/caulobrowser_{{version}}.tar.gz
 
+# Compile README
 build_readme:
     Rscript -e "devtools::build_readme()"
+
+# Build checks
+build_check:
+    R CMD check .
 
 # Build base docker container
 build_docker_base: build_r

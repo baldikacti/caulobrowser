@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Run the app
 ```r
 # Development (hot reload)
-golem::run_dev()       # or: source("dev/run_dev.R")
+golem::run_dev()
 
 # Production
 caulobrowser::run_app()
@@ -15,7 +15,7 @@ caulobrowser::run_app()
 
 ### One-time setup (generate demo database)
 ```r
-source("data-raw/seed_database.R")
+caulobrowser::generate_example_database(path = ".")
 ```
 
 ### Test
@@ -46,7 +46,7 @@ All data lives in a **DuckDB** embedded database opened in read-only mode per se
 
 - `genes` — `gene_id` (VARCHAR PK, CCNA_XXXXX NA1000 locus tag), `cc_tag` (CC_XXXX CB15 legacy tag), `gene_name`, `ncbi_protein_id`, `gene_biotype`, `description`
 
-- `experiments` — `experiment_id` (VARCHAR PK), `display_label`, `experiment_class` (CHECK: `'de_comparison'|'timecourse'|'chipseq'|'proteomics'|'tnseq'|'other'`), `data_type`, `strain`, `genetic_background`, `treatment`, `treatment_level`, `growth_phase`, `media`, `ref_strain`, `ref_treatment`, `ref_treatment_level`, `ref_growth_phase`, `ref_media`, `lab_group`, `doi`, `geo_id`, `date_added`
+- `experiments` — `experiment_id` (VARCHAR PK), `display_label`, `experiment_class`, `data_type`, `strain`, `genetic_background`, `treatment`, `treatment_level`, `growth_phase`, `media`, `ref_strain`, `ref_treatment`, `ref_treatment_level`, `ref_growth_phase`, `ref_media`, `lab_group`, `doi`, `geo_id`, `date_added`
 
 - `experiment_conditions` — (`experiment_id`, `condition_label`) composite PK; `condition_order` (INTEGER), `condition_value` (DOUBLE), `condition_units`, `display_label`. FK → `experiments`
 
@@ -55,8 +55,6 @@ All data lives in a **DuckDB** embedded database opened in read-only mode per se
 - `timecourse_expression` — (`gene_id`, `experiment_id`, `condition_label`) composite PK; `expression_value` (DOUBLE NOT NULL). FK → `genes`, `experiments`, and `experiment_conditions(experiment_id, condition_label)`
 
 Indexes on: `de_results(experiment_id)`, `de_results(gene_id)`, `timecourse_expression(gene_id)`, `timecourse_expression(experiment_id)`, `timecourse_expression(gene_id, experiment_id)`, `experiments(experiment_class)`, `experiments(data_type)`, `experiments(lab_group)`
-
-`data-raw/seed_database.R` creates and populates a demo database with 5 genes. `R/fct_database.R` contains all query functions; tests live in `tests/testthat/test-fct_database.R`.
 
 ### UI / server
 
@@ -68,14 +66,16 @@ Indexes on: `de_results(experiment_id)`, `de_results(gene_id)`, `timecourse_expr
 |------|--------|------|
 | `R/mod_gene_search.R` | `mod_gene_search` | Text input → reactive gene records |
 | `R/mod_overview_table.R` | `mod_overview_table` | Reactable gene summary table with external DB links |
-| `R/mod_expression.R` | `mod_expression` | Expression plots (plotly), cell-schematic SVG, condition selector |
+| `R/mod_expression.R` | `mod_expression` | Expression plots (ggiraph), strain selector |
+| `R/mod_de_heatmap.R` | `mod_de_heatmap` | Comparison heatmaps (ggiraph), data_type selector |
 
 ### Plotting
 
 `R/fct_plots.R` contains:
-- `plot_expression_timecourse()` — multi-gene interactive ggplot2 line chart using ggirafe
+- `plot_expression_timecourse()` — multi-gene interactive ggplot2 line chart using ggiraph
 - `plot_single_expression()` — single-experiment variant
 - `render_cell_schematic()` — custom SVG of Caulobacter cell with protein positions
+- `plot_de_heatmap()` - plots heatmaps from log2foldchange results and facets on data_type
 
 ### Configuration
 

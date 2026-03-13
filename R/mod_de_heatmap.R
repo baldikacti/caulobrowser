@@ -40,10 +40,7 @@ mod_de_heatmap_ui <- function(id) {
       class = "row align-items-start",
       shiny::div(
         class = "col-12 col-lg-8",
-        shiny::div(
-          style = "max-height: 600px; overflow-y: auto;",
-          ggiraph::girafeOutput(ns("de_heatmap"))
-        )
+        ggiraph::girafeOutput(ns("de_heatmap"))
       ),
       shiny::div(
         class = "col-12 col-lg-4",

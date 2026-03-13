@@ -394,6 +394,7 @@ plot_de_heatmap <- function(de_df, height_px = 300, scale_limit = 2) {
     p <- p +
       ggplot2::facet_wrap(
         ~data_type,
+        ncol = 1,
         scales = "free_y",
         labeller = ggplot2::labeller(
           data_type = function(x) {
@@ -419,7 +420,7 @@ plot_de_heatmap <- function(de_df, height_px = 300, scale_limit = 2) {
       ggiraph::opts_selection(
         type = "single",
         only_shiny = TRUE,
-        css = "stroke:#333333;stroke-width:2px;"
+        css = "filter:drop-shadow(0 0 2px #333333);"
       )
     )
   )

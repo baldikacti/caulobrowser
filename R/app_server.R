@@ -5,27 +5,28 @@
 #' @import shiny
 #' @noRd
 app_server <- function(input, output, session) {
-
-
   # ── Database connection (shared across modules) ──────────────
   # Wrapped in a reactive so modules can call db_con()
   db_con <- shiny::reactiveVal()
 
   shiny::observe({
-    tryCatch({
-      con <- get_db_connection()
-      db_con(con)
-    }, error = function(e) {
-      shiny::showNotification(
-        shiny::tagList(
-          shiny::strong("Database Error"),
-          shiny::br(),
-          e$message
-        ),
-        type = "error",
-        duration = NULL  # persistent until dismissed
-      )
-    })
+    tryCatch(
+      {
+        con <- get_db_connection()
+        db_con(con)
+      },
+      error = function(e) {
+        shiny::showNotification(
+          shiny::tagList(
+            shiny::strong("Database Error"),
+            shiny::br(),
+            e$message
+          ),
+          type = "error",
+          duration = NULL # persistent until dismissed
+        )
+      }
+    )
   })
 
   # Clean up on session end
@@ -40,10 +41,8 @@ app_server <- function(input, output, session) {
     }
   })
 
-
   # ── Module: Gene Search ──────────────────────────────────────
   gene_results <- mod_gene_search_server("gene_search", db_con)
-
 
   # ── Conditional panel flag ───────────────────────────────────
   output$has_results <- shiny::reactive({
@@ -52,15 +51,14 @@ app_server <- function(input, output, session) {
   })
   shiny::outputOptions(output, "has_results", suspendWhenHidden = FALSE)
 
-
-  # ── Module: Overview Table (Figure 1) ────────────────────────
+  # ── Module: Overview Table (Section 1) ────────────────────────
   mod_overview_table_server("overview_table", gene_results, db_con)
 
-
-  # ── Module: Expression Profiles (Figure 2) ───────────────────
+  # ── Module: Expression Profiles (Section 2) ───────────────────
   mod_expression_server("expression", gene_results, db_con)
 
-
-  # ── Module: Differential Expression Heatmap (Section 3) ──────
+  # ── Module: Expression Browser (Section 3) ───---------------──
   mod_de_heatmap_server("de_heatmap", gene_results, db_con)
+
+  # ── Module: Fitness Browser (Section 4) ──────-----------------
 }

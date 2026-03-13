@@ -6,7 +6,6 @@
 #' @noRd
 app_ui <- function(request) {
   shiny::tagList(
-
     # Leave this function for adding external resources
     golem_add_external_resources(),
 
@@ -20,7 +19,13 @@ app_ui <- function(request) {
         version = 5,
         bootswatch = "flatly",
         primary = "#2c3e50",
-        "navbar-bg" = "#2c3e50"
+        "navbar-bg" = "#2c3e50",
+        "accordion-button-bg" = "#2c3e50",
+        "accordion-button-color" = "#ffffff",
+        "accordion-button-active-bg" = "#2c3e50",
+        "accordion-button-active-color" = "#ffffff",
+        "accordion-icon-color" = "#ffffff",
+        "accordion-icon-active-color" = "#ffffff"
       ),
 
       # ── Main search & results tab ──────────────────────────
@@ -54,40 +59,30 @@ app_ui <- function(request) {
             ns = shiny::NS(NULL),
 
             # Section 1: Overview table (Figure 1)
-            bslib::card(
-              bslib::card_header(
-                class = "bg-primary text-white",
-                "Gene Overview"
-              ),
-              bslib::card_body(
+            bslib::accordion(
+              bslib::accordion_panel(
+                title = "Gene Overview",
                 mod_overview_table_ui("overview_table")
-              )
-            ),
-
-            shiny::br(),
-
-            # Sections 2-4: Expression & Localization (Figure 2)
-            bslib::card(
-              bslib::card_header(
-                class = "bg-primary text-white",
-                "Expression & Localization"
               ),
-              bslib::card_body(
-                mod_expression_ui("expression")
-              )
+              open = TRUE
             ),
 
-            shiny::br(),
+            # Section 2: Expression & Localization (Figure 2)
+            bslib::accordion(
+              bslib::accordion_panel(
+                title = "Expression & Localization",
+                mod_expression_ui("expression")
+              ),
+              open = FALSE
+            ),
 
             # Section 3: Differential Expression Heatmap
-            bslib::card(
-              bslib::card_header(
-                class = "bg-primary text-white",
-                "Differential Expression"
-              ),
-              bslib::card_body(
+            bslib::accordion(
+              bslib::accordion_panel(
+                title = "Differential Expression",
                 mod_de_heatmap_ui("de_heatmap")
-              )
+              ),
+              open = FALSE
             )
           )
         )
@@ -127,7 +122,8 @@ app_ui <- function(request) {
             "Lasker, K., Schrader, J.M., Men, Y., Marshik, T., Dill, D.L.,",
             "McAdams, H.H., & Shapiro, L. (2016). CauloBrowser: A systems",
             "biology resource for Caulobacter crescentus.",
-            shiny::em("Nucleic Acids Research, 44"), "(D1), D640-D645.",
+            shiny::em("Nucleic Acids Research, 44"),
+            "(D1), D640-D645.",
             shiny::a(
               "DOI: 10.1093/nar/gkv1050",
               href = "https://doi.org/10.1093/nar/gkv1050",
@@ -137,7 +133,7 @@ app_ui <- function(request) {
 
           shiny::h4("Technology"),
           shiny::p(
-            "Built with R Shiny (golem framework), DuckDB, plotly, and reactable."
+            "Built with R Shiny (golem framework), DuckDB, ggiraph, and reactable."
           )
         )
       ),
@@ -187,7 +183,8 @@ golem_add_external_resources <- function() {
       app_title = "CauloBrowser"
     ),
     # Custom CSS
-    shiny::tags$style(shiny::HTML("
+    shiny::tags$style(shiny::HTML(
+      "
       .well {
         background-color: #ffffff;
         border: 1px solid #dee2e6;
@@ -205,6 +202,7 @@ golem_add_external_resources <- function() {
       a {
         color: #3498db;
       }
-    "))
+    "
+    ))
   )
 }

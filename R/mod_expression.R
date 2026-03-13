@@ -153,7 +153,7 @@ mod_expression_server <- function(id, gene_results, db_con) {
           strain_val <- exps$strain[i]
           output_id <- paste0("plot_", exp_id)
 
-          doi_cell <- if (is.present(doi_val)) {
+          doi_cell <- if (is_present(doi_val)) {
             shiny::tags$a(
               href = paste0("https://doi.org/", doi_val),
               target = "_blank",
