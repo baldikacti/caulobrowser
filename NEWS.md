@@ -1,4 +1,4 @@
-# caulobrowser (development version)
+# caulobrowser 0.1.1
 
 - Adds [JBrowseR](https://gmod.org/JBrowseR/index.html) as the genome viewer tool. 
 
