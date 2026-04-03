@@ -76,11 +76,20 @@ app_ui <- function(request) {
               open = FALSE
             ),
 
-            # Section 3: Differential Expression Heatmap
+            # Section 3: Expression Browser
             bslib::accordion(
               bslib::accordion_panel(
-                title = "Differential Expression",
-                mod_de_heatmap_ui("de_heatmap")
+                title = "Expression Browser",
+                mod_de_heatmap_ui("expression_heatmap")
+              ),
+              open = FALSE
+            ),
+
+            # Section 4: Fitness Browser
+            bslib::accordion(
+              bslib::accordion_panel(
+                title = "Fitness Browser",
+                mod_de_heatmap_ui("fitness_heatmap")
               ),
               open = FALSE
             )

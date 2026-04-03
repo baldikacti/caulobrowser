@@ -21,20 +21,7 @@ mod_de_heatmap_ui <- function(id) {
     shiny::p(
       class = "text-muted",
       "Log\u00b2 fold-change values from comparison experiments.",
-      "Blue\u00a0=\u00a0down-regulated, red\u00a0=\u00a0up-regulated relative to the reference.",
-      "Use the dropdown to filter by data type."
-    ),
-    shiny::fluidRow(
-      shiny::column(
-        width = 5,
-        shiny::selectInput(
-          ns("data_type"),
-          label = "Data type",
-          choices = NULL,
-          multiple = TRUE,
-          width = "100%"
-        )
-      )
+      "Blue\u00a0=\u00a0down-regulated, red\u00a0=\u00a0up-regulated relative to the reference."
     ),
     shiny::div(
       class = "row align-items-start",
@@ -51,36 +38,12 @@ mod_de_heatmap_ui <- function(id) {
   )
 }
 
-
-mod_de_heatmap_server <- function(id, gene_results, db_con) {
+mod_de_heatmap_server <- function(id, gene_results, dtype_filter, db_con) {
   shiny::moduleServer(id, function(input, output, session) {
-    # ── Populate data_type dropdown from DB ────────────────────────────────
-    shiny::observe({
-      tryCatch(
-        {
-          types <- get_de_data_types(db_con())
-          if (length(types) > 0) {
-            choices <- c("All types" = "", stats::setNames(types, types))
-            shiny::updateSelectInput(session, "data_type", choices = choices)
-          } else {
-            shiny::updateSelectInput(
-              session,
-              "data_type",
-              choices = c("No DE experiments available" = "")
-            )
-          }
-        },
-        error = function(e) NULL
-      )
-    })
-
     # ── Fetch DE data, reacts to gene selection + data_type filter ─────────
     de_data <- shiny::reactive({
       genes <- gene_results()
       shiny::req(nrow(genes) > 0)
-
-      selected <- input$data_type[nzchar(input$data_type)]
-      dtype_filter <- if (length(selected) > 0) selected else NULL
 
       get_de_results_for_heatmap(
         db_con(),

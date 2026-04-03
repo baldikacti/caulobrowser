@@ -343,8 +343,6 @@ plot_de_heatmap <- function(de_df, height_px = 300, scale_limit = 2) {
     levels = unique(de_df$display_label)
   )
 
-  do_facet <- length(unique(de_df$data_type)) > 1
-
   p <- ggplot2::ggplot(
     de_df,
     ggplot2::aes(x = gene_name, y = display_label, fill = log2fc)
@@ -389,20 +387,6 @@ plot_de_heatmap <- function(de_df, height_px = 300, scale_limit = 2) {
       strip.text = ggplot2::element_text(face = "bold", size = 11),
       panel.spacing = ggplot2::unit(1.5, "lines")
     )
-
-  if (do_facet) {
-    p <- p +
-      ggplot2::facet_wrap(
-        ~data_type,
-        ncol = 1,
-        scales = "free_y",
-        labeller = ggplot2::labeller(
-          data_type = function(x) {
-            tools::toTitleCase(gsub("_", " ", x, fixed = TRUE))
-          }
-        )
-      )
-  }
 
   ggiraph::girafe(
     ggobj = p,
