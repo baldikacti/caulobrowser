@@ -1,3 +1,5 @@
+# caulobrowser 0.2.2
+
 # caulobrowser 0.2.1
 
 - Fixes JBrowseR genome viewer not launching when the tab is clicked directly.

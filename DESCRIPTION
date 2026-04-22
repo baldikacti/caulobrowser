@@ -1,6 +1,6 @@
 Package: caulobrowser
 Title: CauloBrowser: A Systems Biology Resource for Caulobacter Crescentus
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: 
     person("Berent", "Aldikacti", , "aldikactiberent@gmail.com", role = c("aut", "cre"))
 Description: An interactive Shiny application for browsing and visualizing
