@@ -67,7 +67,33 @@ caulobrowser::run_app()
 golem::run_dev()
 ```
 
-### 3. Try searching for: `ctrA, ftsZ, popZ`
+### 3. Run the app with Docker
+
+The app can be launched with Docker without setting up any other dependency other than Docker. 
+
+1. If you do not have Docker, install from [here](https://docs.docker.com/engine/install/).
+After installing Docker, make sure the Docker daemon is running.
+
+2. Download the Caulobrowser database into `~/Downloads/`. (Or any other path)
+
+```bash
+docker run --rm \
+  -v ~/Downloads:/output \
+  baldikacti/caulobrowser:latest \
+  pelican object get osdf:///unity-hpc/caulobrowser/caulobrowser.duckdb /output
+```
+
+> The database file will be saved to `~/Downloads/caulobrowser.duckdb` on your machine.
+
+3. Run the Caulobrowser app, mounting the downloaded database file.
+
+```bash
+docker run --rm -p 3838:3838 \
+  -v ~/Downloads/caulobrowser.duckdb:/database/caulobrowser.duckdb \
+  baldikacti/caulobrowser:latest
+```
+
+> Open `http://localhost:3838` in your browser.
 
 ## Project Structure
 
