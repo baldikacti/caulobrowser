@@ -21,8 +21,7 @@ Imports:
     reactable,
     scales,
     shiny,
-    stats,
-    tools
+    stats
 Suggests: 
     knitr,
     spelling,
