@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.5.2
+FROM rocker/r-ver:4.5.3
 ARG TARGETARCH
 RUN apt-get update -y && apt-get install -y \
     wget \
@@ -12,6 +12,7 @@ RUN apt-get update -y && apt-get install -y \
     pandoc \
     zlib1g-dev \
     libssl-dev \
+    libuv1-dev \
     && rm -rf /var/lib/apt/lists/*
 # Setup pelican binary
 RUN mkdir -p /usr/local/bin && \
@@ -25,7 +26,7 @@ RUN mkdir -p /usr/local/bin && \
 RUN mkdir -p /usr/local/lib/R/etc/ /usr/lib/R/etc/
 RUN echo "options(renv.config.pak.enabled = FALSE, repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" | tee /usr/local/lib/R/etc/Rprofile.site | tee /usr/lib/R/etc/Rprofile.site
 RUN R -e 'install.packages("remotes")'
-RUN R -e 'remotes::install_version("renv", version = "1.1.7")'
+RUN R -e 'remotes::install_version("renv", version = "1.2.3")'
 COPY renv.lock renv.lock
 RUN --mount=type=cache,id=renv-cache,target=/root/.cache/R/renv R -e 'renv::restore()'
 # download duckdb extensions

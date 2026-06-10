@@ -1,5 +1,8 @@
 # caulobrowser 0.5.0
 
+- Added fitness data from [Price, M.N., Wetmore, K.M., Waters, R.J. et al.](https://www.nature.com/articles/s41586-018-0124-0#Abs1)
+- Updated dependencies.
+
 # caulobrowser 0.4.0
 
 - Adds filter controls to the differential expression heatmap.

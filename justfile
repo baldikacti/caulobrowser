@@ -29,19 +29,19 @@ build_docker_base:
     docker build --platform linux/amd64,linux/arm64 -f Dockerfile_base -t baldikacti/caulobrowser_base:latest .
 
 # Build runtime docker container
-build_docker_runtime:
-    docker build --platform linux/amd64,linux/arm64 -f Dockerfile -t baldikacti/caulobrowser:latest -t baldikacti/caulobrowser:{{version}} .
+build_docker_runtime arg: build_r
+    docker build --platform linux/amd64,linux/arm64 --build-arg BASE_IMAGE={{arg}} -f Dockerfile -t baldikacti/caulobrowser:latest -t baldikacti/caulobrowser:{{version}} .
 
 # Push the docker container to DockerHub
 push_docker:
     docker push -a baldikacti/caulobrowser
 
 # Runs the Caulobrowser app from docker
-run_docker:
+run_docker database_path:
     docker run \
         --rm \
         -p 3838:3838 \
-        -v /Users/baldikacti/webapp-dev/caulobrowser/caulobrowser.duckdb:/database/caulobrowser.duckdb \
+        -v {{database_path}}:/database/caulobrowser.duckdb \
         baldikacti/caulobrowser:{{version}}
 
 # Tag release from DESCRIPTION version with NEWS.md entry as message

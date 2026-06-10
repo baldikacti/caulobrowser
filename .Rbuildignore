@@ -26,3 +26,5 @@ deploy/
 ^\./deploy$
 ^justfile$
 ^test\.R$
+^[.]?air[.]toml$
+^\.vscode$
