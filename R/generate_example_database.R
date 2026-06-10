@@ -105,6 +105,7 @@ CREATE TABLE experiments (
     ref_treatment_level VARCHAR,
     ref_growth_phase    VARCHAR,
     ref_media           VARCHAR,
+    stat_method         VARCHAR,
     lab_group           VARCHAR,
     doi                 VARCHAR,
     geo_id              VARCHAR,
@@ -133,7 +134,7 @@ CREATE TABLE de_results (
     gene_id       VARCHAR NOT NULL REFERENCES genes(gene_id),
     experiment_id VARCHAR NOT NULL REFERENCES experiments(experiment_id),
     log2fc        DOUBLE NOT NULL,
-    padj          DOUBLE,
+    stat_value    DOUBLE,
     PRIMARY KEY (gene_id, experiment_id)
 );"
   )
@@ -315,6 +316,7 @@ CREATE TABLE gene_viewer_metadata (
       ref_growth_phase = c(NA_character_, "exponential"),
       ref_media = c(NA_character_, "M2G"),
       lab_group = c("Laub lab", "Laub lab"),
+      stat_method = c("padj", "padj"),
       doi = c("10.1016/j.cell.2009.01.001", "10.1073/pnas.0407828102"),
       geo_id = c("GSE12345", "GSE67890"),
       date_added = as.Date(c("2024-01-15", "2024-03-20")),
@@ -351,7 +353,7 @@ CREATE TABLE gene_viewer_metadata (
       ),
       experiment_id = rep("DE_ctrA_depl", 5),
       log2fc = c(-2.1, -0.4, 1.8, 0.9, -0.2),
-      padj = c(1e-4, 0.32, 2.3e-3, 0.015, 0.78),
+      stat_value = c(1e-4, 0.32, 2.3e-3, 0.015, 0.78),
       stringsAsFactors = FALSE
     )
   )

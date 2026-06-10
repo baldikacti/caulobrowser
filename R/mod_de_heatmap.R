@@ -87,8 +87,13 @@ mod_de_heatmap_server <- function(id, gene_results, dtype_filter, db_con) {
           db_con(),
           gene_ids = genes$gene_id,
           data_type = dtype_filter
-        ) |>
-          subset(padj < 0.05)
+        )
+        keep <- with(
+          de_res,
+          (stat_method == "padj" & stat_value < 0.05) |
+            (stat_method == "t-statistic" & abs(stat_value) > 4)
+        )
+        de_res <- de_res[(keep & !is.na(keep)), ]
       } else {
         de_res <- get_de_results_for_heatmap(
           db_con(),
@@ -124,7 +129,7 @@ mod_de_heatmap_server <- function(id, gene_results, dtype_filter, db_con) {
       max_experiments <- max(
         tapply(df$display_label, df$data_type, function(x) length(unique(x)))
       )
-      max(200L, max_experiments * 28L)
+      max(200L, max_experiments * 18L)
     })
 
     # ── Experiment details panel (click to show) ───────────────────────────
@@ -180,6 +185,7 @@ mod_de_heatmap_server <- function(id, gene_results, dtype_filter, db_con) {
               ),
               make_row("Reference Media:", na_or(row$ref_media)),
               make_row("Reference Growth phase:", na_or(row$ref_growth_phase)),
+              make_row("Statistic Method:", na_or(row$stat_method)),
               make_row("Lab group:", na_or(row$lab_group)),
               make_row("DOI:", doi_cell)
             )

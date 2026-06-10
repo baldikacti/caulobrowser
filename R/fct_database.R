@@ -104,13 +104,15 @@ search_genes <- function(con, query) {
   # Same terms bound three times (one per IN clause)
   result <- DBI::dbGetQuery(con, sql, params = rep(terms, 3))
 
-  if (nrow(result) == 0) return(result)
+  if (nrow(result) == 0) {
+    return(result)
+  }
 
   # Preserve input order: find the earliest matching term position per row
   pos <- pmin(
     match(tolower(result$gene_name), terms),
-    match(tolower(result$cc_tag),    terms),
-    match(tolower(result$gene_id),   terms),
+    match(tolower(result$cc_tag), terms),
+    match(tolower(result$gene_id), terms),
     na.rm = TRUE
   )
   result[order(pos), ]
@@ -222,7 +224,7 @@ get_timecourse_backgrounds <- function(con) {
 #' @param con DBI connection
 #' @param gene_ids Character vector of gene IDs.
 #' @return A data.frame with columns `gene_id`, `experiment_id`, `log2fc`,
-#'   `padj`, `gene_name`, `cc_tag`, `display_label`.
+#'   `stat_value`, `gene_name`, `cc_tag`, `display_label`, `stat_method`.
 #' @noRd
 get_de_results <- function(con, gene_ids) {
   placeholders <- paste(rep("?", length(gene_ids)), collapse = ", ")
@@ -232,10 +234,11 @@ get_de_results <- function(con, gene_ids) {
        dr.gene_id,
        dr.experiment_id,
        dr.log2fc,
-       dr.padj,
+       dr.stat_value,
        g.gene_name,
        g.cc_tag,
-       exp.display_label
+       exp.display_label,
+       exp.stat_method
      FROM de_results dr
      JOIN genes g         ON dr.gene_id       = g.gene_id
      JOIN experiments exp ON dr.experiment_id = exp.experiment_id
@@ -274,8 +277,8 @@ get_de_data_types <- function(con) {
 #'   Pass NULL to include all types.
 #' @return A data.frame with columns: `gene_id`, `gene_name`, `cc_tag`,
 #'   `experiment_id`, `display_label`, `data_type`, `strain`, `treatment`,
-#'   `treatment_level`, `media`, `growth_phase`, `lab_group`, `doi`,
-#'   `log2fc`, `padj`.
+#'   `treatment_level`, `media`, `growth_phase`, `stat_method`, `lab_group`, `doi`,
+#'   `log2fc`, `stat_value`.
 #' @noRd
 get_de_results_for_heatmap <- function(con, gene_ids, data_type = NULL) {
   gene_placeholders <- paste(rep("?", length(gene_ids)), collapse = ", ")
@@ -299,11 +302,12 @@ get_de_results_for_heatmap <- function(con, gene_ids, data_type = NULL) {
        exp.ref_treatment_level,
        exp.ref_media,
        exp.ref_growth_phase,
+       exp.stat_method,
        exp.lab_group,
        exp.doi,
        exp.geo_id,
        dr.log2fc,
-       dr.padj
+       dr.stat_value
      FROM de_results dr
      JOIN genes g         ON dr.gene_id       = g.gene_id
      JOIN experiments exp ON dr.experiment_id = exp.experiment_id

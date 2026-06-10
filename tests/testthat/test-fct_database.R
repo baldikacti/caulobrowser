@@ -131,10 +131,11 @@ test_that("get_de_results returns correct columns and values", {
     "gene_id",
     "experiment_id",
     "log2fc",
-    "padj",
+    "stat_value",
     "gene_name",
     "cc_tag",
-    "display_label"
+    "display_label",
+    "stat_method"
   )
   expect_true(all(expected_cols %in% colnames(result)))
   expect_equal(nrow(result), 1)
@@ -178,9 +179,10 @@ test_that("get_de_results_for_heatmap returns correct columns with no filter", {
     "cc_tag",
     "experiment_id",
     "display_label",
+    "stat_method",
     "data_type",
     "log2fc",
-    "padj"
+    "stat_value"
   )
   expect_true(all(expected_cols %in% colnames(result)))
   expect_equal(nrow(result), 2)

@@ -305,7 +305,7 @@ render_cell_schematic <- function(
 #' Color fill is a diverging blue-white-red scale centered at 0.
 #'
 #' @param de_df Data frame from `get_de_results_for_heatmap()`. Expected
-#'   columns: gene_name, display_label, log2fc, padj, experiment_id.
+#'   columns: gene_name, display_label, log2fc, stat_value, stat_method, experiment_id.
 #' @param height_px Integer. Total plot height in pixels passed to girafe().
 #' @param scale_limit Integer. Limit of the log2 scale of the heatmap. (Default: 2)
 #' @return A girafe object.
@@ -325,11 +325,11 @@ plot_de_heatmap <- function(de_df, height_px = 300, scale_limit = 2) {
     "log2FC: ",
     round(de_df$log2fc, 3),
     "\n",
-    "padj: ",
+    paste0(de_df$stat_method, ": "),
     ifelse(
-      is.na(de_df$padj),
+      is.na(de_df$stat_value),
       "NA",
-      formatC(de_df$padj, format = "e", digits = 2)
+      formatC(de_df$stat_value, format = "e", digits = 2)
     )
   )
 
@@ -369,7 +369,7 @@ plot_de_heatmap <- function(de_df, height_px = 300, scale_limit = 2) {
         vjust = 0,
         size = 10
       ),
-      axis.text.y = ggplot2::element_text(face = "italic", size = 11),
+      axis.text.y = ggplot2::element_text(face = "italic", size = 8),
       panel.grid = ggplot2::element_blank(),
       legend.position = "right",
       plot.margin = ggplot2::margin(t = 10, r = 10, b = 20, l = 10),

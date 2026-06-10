@@ -65,6 +65,7 @@ The app reads from a DuckDB database with six tables.
 | `ref_treatment_level` | VARCHAR | |
 | `ref_growth_phase` | VARCHAR | |
 | `ref_media` | VARCHAR | |
+| `stat_method` | VARCHAR | |
 | `lab_group` | VARCHAR | |
 | `doi` | VARCHAR | |
 | `geo_id` | VARCHAR | |
@@ -92,7 +93,7 @@ FK → `genes`, `experiments`
 | `gene_id` | VARCHAR | PK (composite) |
 | `experiment_id` | VARCHAR | PK (composite) |
 | `log2fc` | DOUBLE | NOT NULL |
-| `padj` | DOUBLE | |
+| `stat_value` | DOUBLE | |
 
 ## timecourse_expression
 
