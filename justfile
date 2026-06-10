@@ -41,7 +41,7 @@ run_docker:
     docker run \
         --rm \
         -p 3838:3838 \
-        -v /Users/baldikacti/webapp-dev/caulobrowser_data/caulobrowser.duckdb:/database/caulobrowser.duckdb \
+        -v /Users/baldikacti/webapp-dev/caulobrowser/caulobrowser.duckdb:/database/caulobrowser.duckdb \
         baldikacti/caulobrowser:{{version}}
 
 # Tag release from DESCRIPTION version with NEWS.md entry as message

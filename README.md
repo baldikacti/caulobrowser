@@ -56,7 +56,7 @@ differential expression results.
 **Real database**
 
 ``` bash
-pelican object get osdf:///unity-hpc/caulobrowser/caulobrowser.duckdb .
+pelican object get 'osdf:///unity-hpc/caulobrowser/caulobrowser.duckdb?directread' .
 ```
 
 This downloads the real app database to the current directory. (Dot
@@ -87,7 +87,7 @@ The app can be launched with Docker without any other dependencies.
 docker run --rm \
   -v ~/Downloads:/output \
   baldikacti/caulobrowser:latest \
-  pelican object get osdf:///unity-hpc/caulobrowser/caulobrowser.duckdb /output
+  pelican object get 'osdf:///unity-hpc/caulobrowser/caulobrowser.duckdb?directread' /output
 ```
 
 > The database file will be saved to `~/Downloads/caulobrowser.duckdb`
