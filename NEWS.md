@@ -1,3 +1,5 @@
+# caulobrowser 0.5.0
+
 # caulobrowser 0.4.0
 
 - Adds filter controls to the differential expression heatmap.
