@@ -3,8 +3,6 @@ name: Docker
 on:
   push:
     branches: [ "main" ]
-    # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
 
 env:
   REGISTRY: ghcr.io
@@ -44,6 +42,10 @@ jobs:
         uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+          flavor: |
+            latest=false
 
       - name: Build and push base image (amd64)
         id: build-and-push
@@ -88,6 +90,10 @@ jobs:
         uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+          flavor: |
+            latest=false
 
       - name: Build and push base image (arm64)
         id: build-and-push
@@ -135,6 +141,10 @@ jobs:
         uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+          flavor: |
+            latest=false
 
       - name: Create and push multi-arch manifest
         run: |
@@ -146,7 +156,7 @@ jobs:
       - name: Get manifest digest
         id: get-digest
         run: |
-          VERSION=$(jq -r '.version' <<< "$DOCKER_METADATA_OUTPUT_JSON")
+          VERSION=$DOCKER_METADATA_OUTPUT_VERSION
           DIGEST=$(docker buildx imagetools inspect \
             "${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:${VERSION}" \
             --format '{{.Manifest.Digest}}')
@@ -202,11 +212,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Get R package version
+        id: pkg-version
+        run: echo "version=$(grep '^Version:' DESCRIPTION | awk '{print $2}')" >> $GITHUB_OUTPUT
+
       - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ steps.pkg-version.outputs.version }}
+          flavor: |
+            latest=false
 
       - name: Build and push runtime image
         id: build-and-push
