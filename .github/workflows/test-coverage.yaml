@@ -3,6 +3,14 @@
 on:
   push:
     branches: [main, master]
+    paths:
+      - 'R/**'
+      - 'app.R'
+      - 'DESCRIPTION'
+      - 'NAMESPACE'
+      - 'inst/**'
+      - 'man/**'
+      - 'tests/**'
   pull_request:
 
 name: test-coverage.yaml

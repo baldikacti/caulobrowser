@@ -28,3 +28,5 @@ deploy/
 ^test\.R$
 ^[.]?air[.]toml$
 ^\.vscode$
+^\.covrignore$
+^\.Rprofile$
