@@ -42,7 +42,7 @@ run_docker database_path:
         --rm \
         -p 3838:3838 \
         -v {{database_path}}:/database/caulobrowser.duckdb \
-        baldikacti/caulobrowser:{{version}}
+        ghcr.io/baldikacti/caulobrowser:{{version}}
 
 # Tag release from DESCRIPTION version with NEWS.md entry as message
 tag_release:
