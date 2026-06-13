@@ -4,7 +4,17 @@
 
 # ── Dependencies ──────────────────────────────────
 # Add package dependencies (these update DESCRIPTION automatically)
-attachment::att_amend_desc()
+attachment::att_amend_desc(
+  extra.suggests = c(
+    "knitr",
+    "devtools",
+    "roxygen2",
+    "usethis",
+    "pkgdown",
+    "covr"
+  ),
+  update.config = TRUE
+)
 
 usethis::use_package("shiny")
 usethis::use_package("golem")

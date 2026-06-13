@@ -47,6 +47,17 @@ mod_overview_table_server <- function(id, gene_results, db_con) {
         g <- genes[i, ]
         viewer_link(g$start_pos, g$end_pos, ns)
       })
+      rows[[
+        "Molecules translated per cell (M2G)"
+      ]] <- signif(genes$translated_prot_ave, 3)
+      rows[[
+        "Transcription rate (M2G)"
+      ]] <- paste(signif(genes$copynumber_lifetime_min, 3), "minutes")
+      rows[["mRNA Copy Number per Cell (M2G)"]] <- signif(genes$copynumber, 3)
+      rows[["mRNA Halflife (M2G)"]] <- paste(
+        signif(genes$mrna_halflife, 3),
+        "minutes"
+      )
 
       # ── Section: PRODUCT ───────────────────────────────────────────────────
       rows[[".hdr.Product"]] <- rep("", n)

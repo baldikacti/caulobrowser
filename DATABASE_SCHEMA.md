@@ -15,6 +15,10 @@ The app reads from a DuckDB database with six tables.
 | `strand` | VARCHAR | |
 | `length` | VARCHAR | |
 | `mass` | VARCHAR | |
+| `copynumber_lifetime_min` | DOUBLE | |
+| `copynumber` | DOUBLE | |
+| `translated_prot_ave` | DOUBLE | |
+| `mrna_halflife` | DOUBLE | |
 | `gene_biotype` | VARCHAR | |
 | `product` | VARCHAR | |
 | `description` | VARCHAR | |

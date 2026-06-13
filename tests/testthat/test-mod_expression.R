@@ -17,15 +17,28 @@ testServer(
   mod_expression_server,
   args = list(
     gene_results = shiny::reactive(
-      search_genes(generate_example_database(":memory:"), "ctrA")
+      search_genes(
+        DBI::dbConnect(
+          duckdb::duckdb(),
+          system.file(
+            "extdata",
+            "caulobrowser.duckdb",
+            package = "caulobrowser"
+          )
+        ),
+        "CCNA_01248"
+      )
     ),
-    db_con = shiny::reactiveVal(generate_example_database(":memory:"))
+    db_con = shiny::reactiveVal(DBI::dbConnect(
+      duckdb::duckdb(),
+      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+    ))
   ),
   {
     pal <- color_palette()
     expect_type(pal, "character")
     expect_equal(length(pal), 1)
-    expect_true("ctrA" %in% names(pal))
+    expect_true("CCNA_01248" %in% names(pal))
   }
 )
 
@@ -34,15 +47,28 @@ testServer(
   mod_expression_server,
   args = list(
     gene_results = shiny::reactive(
-      search_genes(generate_example_database(":memory:"), "ctrA,dnaA")
+      search_genes(
+        DBI::dbConnect(
+          duckdb::duckdb(),
+          system.file(
+            "extdata",
+            "caulobrowser.duckdb",
+            package = "caulobrowser"
+          )
+        ),
+        "CCNA_00090,CCNA_01248"
+      )
     ),
-    db_con = shiny::reactiveVal(generate_example_database(":memory:"))
+    db_con = shiny::reactiveVal(DBI::dbConnect(
+      duckdb::duckdb(),
+      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+    ))
   ),
   {
     pal <- color_palette()
     expect_gte(length(pal), 2)
-    expect_true("ctrA" %in% names(pal))
-    expect_true("dnaA" %in% names(pal))
+    expect_true("CCNA_00090" %in% names(pal))
+    expect_true("CCNA_01248" %in% names(pal))
   }
 )
 
@@ -51,9 +77,22 @@ testServer(
   mod_expression_server,
   args = list(
     gene_results = shiny::reactive(
-      search_genes(generate_example_database(":memory:"), "ctrA")
+      search_genes(
+        DBI::dbConnect(
+          duckdb::duckdb(),
+          system.file(
+            "extdata",
+            "caulobrowser.duckdb",
+            package = "caulobrowser"
+          )
+        ),
+        "CCNA_00090"
+      )
     ),
-    db_con = shiny::reactiveVal(generate_example_database(":memory:"))
+    db_con = shiny::reactiveVal(DBI::dbConnect(
+      duckdb::duckdb(),
+      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+    ))
   ),
   {
     session$setInputs(genetic_background = "wildtype")
@@ -70,9 +109,22 @@ testServer(
   mod_expression_server,
   args = list(
     gene_results = shiny::reactive(
-      search_genes(generate_example_database(":memory:"), "ctrA")
+      search_genes(
+        DBI::dbConnect(
+          duckdb::duckdb(),
+          system.file(
+            "extdata",
+            "caulobrowser.duckdb",
+            package = "caulobrowser"
+          )
+        ),
+        "CCNA_00090"
+      )
     ),
-    db_con = shiny::reactiveVal(generate_example_database(":memory:"))
+    db_con = shiny::reactiveVal(DBI::dbConnect(
+      duckdb::duckdb(),
+      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+    ))
   ),
   {
     session$setInputs(genetic_background = "not_a_background")
@@ -86,9 +138,22 @@ testServer(
   mod_expression_server,
   args = list(
     gene_results = shiny::reactive(
-      search_genes(generate_example_database(":memory:"), "ctrA,dnaA")
+      search_genes(
+        DBI::dbConnect(
+          duckdb::duckdb(),
+          system.file(
+            "extdata",
+            "caulobrowser.duckdb",
+            package = "caulobrowser"
+          )
+        ),
+        "CCNA_00090,CCNA_01248"
+      )
     ),
-    db_con = shiny::reactiveVal(generate_example_database(":memory:"))
+    db_con = shiny::reactiveVal(DBI::dbConnect(
+      duckdb::duckdb(),
+      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+    ))
   ),
   {
     session$setInputs(genetic_background = "wildtype")

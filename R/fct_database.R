@@ -14,7 +14,8 @@ get_db_connection <- function() {
     stop(
       "Database path could not be resolved.\n",
       "  Set the CAULOBROWSER_DB_PATH environment variable to an existing .duckdb file, or\n",
-      "  run `caulobrowser::generate_example_database()` to create a demo database.",
+      "  use `system.file('extdata', 'caulobrowser.duckdb', package = 'caulobrowser')` to retrieve the demo database path.\n",
+      "  Set the CAULOBROWSER_DB_PATH variable to the demo database path",
       call. = FALSE
     )
   }
@@ -24,8 +25,9 @@ get_db_connection <- function() {
       "Database file not found: ",
       db_path,
       "\n",
-      "  Set CAULOBROWSER_DB_PATH to an existing .duckdb file, or\n",
-      "  run `caulobrowser::generate_example_database()` to create a demo database.",
+      "  Set the CAULOBROWSER_DB_PATH environment variable to an existing .duckdb file, or\n",
+      "  use `system.file('extdata', 'caulobrowser.duckdb', package = 'caulobrowser')` to retrieve the demo database path.\n",
+      "  Set the CAULOBROWSER_DB_PATH variable to the demo database path",
       call. = FALSE
     )
   }
@@ -58,8 +60,6 @@ get_db_connection <- function() {
       "\n",
       "  Database path: ",
       db_path,
-      "\n",
-      "  Run `caulobrowser::generate_example_database()` to create a demo database.",
       call. = FALSE
     )
   }

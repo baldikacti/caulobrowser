@@ -17,14 +17,24 @@ testServer(
   mod_overview_table_server,
   args = list(
     gene_results = shiny::reactive(
-      search_genes(generate_example_database(":memory:"), "ctrA")
+      search_genes(
+        DBI::dbConnect(
+          duckdb::duckdb(),
+          system.file(
+            "extdata",
+            "caulobrowser.duckdb",
+            package = "caulobrowser"
+          )
+        ),
+        "CCNA_01248"
+      )
     ),
     db_con = shiny::reactiveVal(NULL)
   ),
   {
     df <- overview_data()
     expect_true("Category" %in% colnames(df))
-    expect_true("ctrA" %in% colnames(df))
+    expect_true("CCNA_01248" %in% colnames(df))
     expect_equal(ncol(df), 2) # Category + one gene
   }
 )
@@ -34,7 +44,17 @@ testServer(
   mod_overview_table_server,
   args = list(
     gene_results = shiny::reactive(
-      search_genes(generate_example_database(":memory:"), "ctrA")
+      search_genes(
+        DBI::dbConnect(
+          duckdb::duckdb(),
+          system.file(
+            "extdata",
+            "caulobrowser.duckdb",
+            package = "caulobrowser"
+          )
+        ),
+        "CCNA_01248"
+      )
     ),
     db_con = shiny::reactiveVal(NULL)
   ),
@@ -51,15 +71,25 @@ testServer(
   mod_overview_table_server,
   args = list(
     gene_results = shiny::reactive(
-      search_genes(generate_example_database(":memory:"), "ctrA,dnaA")
+      search_genes(
+        DBI::dbConnect(
+          duckdb::duckdb(),
+          system.file(
+            "extdata",
+            "caulobrowser.duckdb",
+            package = "caulobrowser"
+          )
+        ),
+        "CCNA_00090,CCNA_01248"
+      )
     ),
     db_con = shiny::reactiveVal(NULL)
   ),
   {
     df <- overview_data()
     expect_equal(ncol(df), 3) # Category + 2 genes
-    expect_true("ctrA" %in% colnames(df))
-    expect_true("dnaA" %in% colnames(df))
+    expect_true("CCNA_00090" %in% colnames(df))
+    expect_true("CCNA_01248" %in% colnames(df))
   }
 )
 
@@ -68,7 +98,17 @@ testServer(
   mod_overview_table_server,
   args = list(
     gene_results = shiny::reactive(
-      search_genes(generate_example_database(":memory:"), "ctrA")
+      search_genes(
+        DBI::dbConnect(
+          duckdb::duckdb(),
+          system.file(
+            "extdata",
+            "caulobrowser.duckdb",
+            package = "caulobrowser"
+          )
+        ),
+        "ctrA"
+      )
     ),
     db_con = shiny::reactiveVal(NULL)
   ),
@@ -82,7 +122,17 @@ testServer(
   mod_overview_table_server,
   args = list(
     gene_results = shiny::reactive(
-      search_genes(generate_example_database(":memory:"), "ctrA")
+      search_genes(
+        DBI::dbConnect(
+          duckdb::duckdb(),
+          system.file(
+            "extdata",
+            "caulobrowser.duckdb",
+            package = "caulobrowser"
+          )
+        ),
+        "ctrA"
+      )
     ),
     db_con = shiny::reactiveVal(NULL)
   ),

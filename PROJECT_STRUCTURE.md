@@ -11,7 +11,6 @@ caulobrowser/
 │   ├── run_app.R            # Entry point
 │   ├── fct_database.R       # DuckDB connection & query functions
 │   ├── fct_plots.R          # Plotting helpers (ggiraph, SVG schematics)
-│   ├── generate_example_database.R  # Demo database generator
 │   ├── mod_gene_search.R    # Module: gene search bar
 │   ├── mod_overview_table.R # Module: Figure 1 overview table
 │   ├── mod_expression.R     # Module: Figure 2 expression & localization

@@ -14,10 +14,13 @@ golem::run_dev()
 caulobrowser::run_app()
 ```
 
-### One-time setup (generate demo in-memory database)
+### Connect to demo database
 
 ```r
-caulobrowser::generate_example_database(":memory:")
+con <- DBI::dbConnect(
+    duckdb::duckdb(),
+    system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+  )
 ```
 
 ### Test

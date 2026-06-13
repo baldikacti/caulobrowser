@@ -17,7 +17,12 @@ test_that("mod_gene_search_server has correct formals", {
 # Namespace wiring
 testServer(
   mod_gene_search_server,
-  args = list(db_con = shiny::reactiveVal(generate_example_database(":memory:"))),
+  args = list(
+    db_con = shiny::reactiveVal(DBI::dbConnect(
+      duckdb::duckdb(),
+      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+    ))
+  ),
   {
     ns <- session$ns
     expect_true(inherits(ns, "function"))
@@ -28,19 +33,29 @@ testServer(
 # Known-gene search returns matching row
 testServer(
   mod_gene_search_server,
-  args = list(db_con = shiny::reactiveVal(generate_example_database(":memory:"))),
+  args = list(
+    db_con = shiny::reactiveVal(DBI::dbConnect(
+      duckdb::duckdb(),
+      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+    ))
+  ),
   {
-    session$setInputs(gene_query = "ctrA", btn_search = 1)
+    session$setInputs(gene_query = "CCNA_00090", btn_search = 1)
     result <- gene_results()
     expect_equal(nrow(result), 1)
-    expect_equal(result$gene_name, "ctrA")
+    expect_equal(result$gene_name, "CCNA_00090")
   }
 )
 
 # No-match query returns 0 rows
 testServer(
   mod_gene_search_server,
-  args = list(db_con = shiny::reactiveVal(generate_example_database(":memory:"))),
+  args = list(
+    db_con = shiny::reactiveVal(DBI::dbConnect(
+      duckdb::duckdb(),
+      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+    ))
+  ),
   {
     session$setInputs(gene_query = "notAGene", btn_search = 1)
     result <- gene_results()
@@ -51,9 +66,14 @@ testServer(
 # Comma-separated query returns multiple genes
 testServer(
   mod_gene_search_server,
-  args = list(db_con = shiny::reactiveVal(generate_example_database(":memory:"))),
+  args = list(
+    db_con = shiny::reactiveVal(DBI::dbConnect(
+      duckdb::duckdb(),
+      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+    ))
+  ),
   {
-    session$setInputs(gene_query = "ctrA,dnaA", btn_search = 1)
+    session$setInputs(gene_query = "CCNA_00090,CCNA_01248", btn_search = 1)
     result <- gene_results()
     expect_gte(nrow(result), 2)
   }
@@ -62,7 +82,12 @@ testServer(
 # Search by CCNA locus tag
 testServer(
   mod_gene_search_server,
-  args = list(db_con = shiny::reactiveVal(generate_example_database(":memory:"))),
+  args = list(
+    db_con = shiny::reactiveVal(DBI::dbConnect(
+      duckdb::duckdb(),
+      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+    ))
+  ),
   {
     session$setInputs(gene_query = "CCNA_00090", btn_search = 1)
     result <- gene_results()

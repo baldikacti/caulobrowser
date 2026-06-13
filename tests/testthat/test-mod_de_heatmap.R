@@ -17,16 +17,35 @@ testServer(
   mod_de_heatmap_server,
   args = list(
     gene_results = shiny::reactive(
-      search_genes(generate_example_database(":memory:"), "ctrA")
+      search_genes(
+        DBI::dbConnect(
+          duckdb::duckdb(),
+          system.file(
+            "extdata",
+            "caulobrowser.duckdb",
+            package = "caulobrowser"
+          )
+        ),
+        "CCNA_01248"
+      )
     ),
     dtype_filter = c("rnaseq"),
-    db_con = shiny::reactiveVal(generate_example_database(":memory:"))
+    db_con = shiny::reactiveVal(DBI::dbConnect(
+      duckdb::duckdb(),
+      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+    ))
   ),
   {
     session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
     df <- de_data()
     expect_s3_class(df, "data.frame")
-    for (col in c("gene_id", "log2fc", "experiment_id", "display_label", "data_type")) {
+    for (col in c(
+      "gene_id",
+      "log2fc",
+      "experiment_id",
+      "display_label",
+      "data_type"
+    )) {
       expect_true(col %in% colnames(df))
     }
     expect_true(nrow(df) > 0)
@@ -38,10 +57,23 @@ testServer(
   mod_de_heatmap_server,
   args = list(
     gene_results = shiny::reactive(
-      search_genes(generate_example_database(":memory:"), "ctrA")
+      search_genes(
+        DBI::dbConnect(
+          duckdb::duckdb(),
+          system.file(
+            "extdata",
+            "caulobrowser.duckdb",
+            package = "caulobrowser"
+          )
+        ),
+        "CCNA_00090"
+      )
     ),
     dtype_filter = c("rnaseq"),
-    db_con = shiny::reactiveVal(generate_example_database(":memory:"))
+    db_con = shiny::reactiveVal(DBI::dbConnect(
+      duckdb::duckdb(),
+      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+    ))
   ),
   {
     session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
@@ -55,10 +87,23 @@ testServer(
   mod_de_heatmap_server,
   args = list(
     gene_results = shiny::reactive(
-      search_genes(generate_example_database(":memory:"), "ctrA")
+      search_genes(
+        DBI::dbConnect(
+          duckdb::duckdb(),
+          system.file(
+            "extdata",
+            "caulobrowser.duckdb",
+            package = "caulobrowser"
+          )
+        ),
+        "CCNA_00090"
+      )
     ),
     dtype_filter = c("tnseq"),
-    db_con = shiny::reactiveVal(generate_example_database(":memory:"))
+    db_con = shiny::reactiveVal(DBI::dbConnect(
+      duckdb::duckdb(),
+      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+    ))
   ),
   {
     session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
@@ -72,10 +117,23 @@ testServer(
   mod_de_heatmap_server,
   args = list(
     gene_results = shiny::reactive(
-      search_genes(generate_example_database(":memory:"), "notAGene")
+      search_genes(
+        DBI::dbConnect(
+          duckdb::duckdb(),
+          system.file(
+            "extdata",
+            "caulobrowser.duckdb",
+            package = "caulobrowser"
+          )
+        ),
+        "notAGene"
+      )
     ),
     dtype_filter = c("rnaseq"),
-    db_con = shiny::reactiveVal(generate_example_database(":memory:"))
+    db_con = shiny::reactiveVal(DBI::dbConnect(
+      duckdb::duckdb(),
+      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+    ))
   ),
   {
     session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
@@ -88,10 +146,23 @@ testServer(
   mod_de_heatmap_server,
   args = list(
     gene_results = shiny::reactive(
-      search_genes(generate_example_database(":memory:"), "ctrA")
+      search_genes(
+        DBI::dbConnect(
+          duckdb::duckdb(),
+          system.file(
+            "extdata",
+            "caulobrowser.duckdb",
+            package = "caulobrowser"
+          )
+        ),
+        "CCNA_00090"
+      )
     ),
     dtype_filter = c("rnaseq"),
-    db_con = shiny::reactiveVal(generate_example_database(":memory:"))
+    db_con = shiny::reactiveVal(DBI::dbConnect(
+      duckdb::duckdb(),
+      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+    ))
   ),
   {
     session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
@@ -104,10 +175,23 @@ testServer(
   mod_de_heatmap_server,
   args = list(
     gene_results = shiny::reactive(
-      search_genes(generate_example_database(":memory:"), "ctrA")
+      search_genes(
+        DBI::dbConnect(
+          duckdb::duckdb(),
+          system.file(
+            "extdata",
+            "caulobrowser.duckdb",
+            package = "caulobrowser"
+          )
+        ),
+        "CCNA_01248"
+      )
     ),
     dtype_filter = c("tnseq"),
-    db_con = shiny::reactiveVal(generate_example_database(":memory:"))
+    db_con = shiny::reactiveVal(DBI::dbConnect(
+      duckdb::duckdb(),
+      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+    ))
   ),
   {
     session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
