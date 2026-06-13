@@ -1,3 +1,12 @@
+# caulobrowser 0.6.0
+
+- Adds mRNA and protein quantification data types to the expression browser.
+- Updates database schema to support quantification data.
+- Bundles an example DuckDB database in `inst/extdata` for offline development and testing; removes the standalone `generate_example_database()` export.
+- Splits Docker build into separate base and runtime images to speed up CI builds.
+- Skips package build and tests in CI when no package files changed.
+- Updated R dependencies.
+
 # caulobrowser 0.5.0
 
 - Added fitness data from [Price, M.N., Wetmore, K.M., Waters, R.J. et al.](https://www.nature.com/articles/s41586-018-0124-0#Abs1)
