@@ -1,7 +1,7 @@
 # Database Schema
 
 CauloBrowser DuckDB database for Caulobacter crescentus NA1000.
-xThe app reads from a DuckDB database with six tables.
+The app reads from a DuckDB database with six tables.
 
 ## genes
 
