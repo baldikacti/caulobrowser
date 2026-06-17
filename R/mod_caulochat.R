@@ -1,3 +1,35 @@
+# Package-level cache: populated on first runtime call, never at load time.
+.qc_cache <- new.env(parent = emptyenv())
+
+#' Return the process-level QueryChat singleton, creating it on first call.
+#' @noRd
+make_caulochat_qc <- function() {
+  if (is.null(.qc_cache$qc)) {
+    .qc_cache$qc <- querychat::QueryChat$new(
+      NULL,
+      "genes",
+      client = ellmer::chat_anthropic(model = "claude-sonnet-4-6"),
+      data_description = readLines(
+        system.file("prompts", "data_description.md", package = "caulobrowser"),
+        warn = FALSE
+      ) |>
+        paste(collapse = "\n"),
+      prompt_template = readLines(
+        system.file("prompts", "query.md", package = "caulobrowser"),
+        warn = FALSE
+      ) |>
+        paste(collapse = "\n"),
+      greeting = readLines(
+        system.file("prompts", "greeting.md", package = "caulobrowser"),
+        warn = FALSE
+      ) |>
+        paste(collapse = "\n"),
+      tools = c("filter", "query", "visualize")
+    )
+  }
+  .qc_cache$qc
+}
+
 #' caulochat UI Function
 #'
 #' @description A shiny Module.
@@ -7,31 +39,9 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-
-qc <- querychat::QueryChat$new(
-  NULL,
-  "genes",
-  client = ellmer::chat_anthropic(model = "claude-sonnet-4-6"),
-  data_description = readLines(
-    system.file("prompts", "data_description.md", package = "caulobrowser"),
-    warn = FALSE
-  ) |>
-    paste(collapse = "\n"),
-  prompt_template = readLines(
-    system.file("prompts", "query.md", package = "caulobrowser"),
-    warn = FALSE
-  ) |>
-    paste(collapse = "\n"),
-  greeting = readLines(
-    system.file("prompts", "greeting.md", package = "caulobrowser"),
-    warn = FALSE
-  ) |>
-    paste(collapse = "\n"),
-  tools = c("filter", "query", "visualize")
-)
-
 mod_caulochat_ui <- function(id) {
   ns <- NS(id)
+  qc <- make_caulochat_qc()
   bslib::page_sidebar(
     title = "Caulo Chat",
     sidebar = qc$sidebar(width = 400, id = ns(qc$id)),
@@ -59,7 +69,7 @@ mod_caulochat_server <- function(id, db_con) {
     shiny::observeEvent(
       db_con(),
       {
-        qc_vals <- qc$server(data_source = db_con())
+        qc_vals <- .qc_cache$qc$server(data_source = db_con())
         output$dt <- reactable::renderReactable(
           reactable::reactable(
             qc_vals$df(),
