@@ -1,3 +1,7 @@
+# caulobrowser 0.7.0
+
+- Adds the alpha version of the CauloChat feature.
+
 # caulobrowser 0.6.0
 
 - Adds mRNA and protein quantification data types to the expression browser.
