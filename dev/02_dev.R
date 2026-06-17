@@ -31,6 +31,9 @@ usethis::use_package("reactable")
 usethis::use_package("shinyWidgets")
 usethis::use_package("tidyr")
 usethis::use_package("JBrowseR")
+usethis::use_package("querychat")
+usethis::use_package("DT")
+
 
 # ── Add Modules ───────────────────────────────────
 # These were already created manually, but for new modules use:

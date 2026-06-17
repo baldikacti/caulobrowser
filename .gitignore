@@ -1,6 +1,7 @@
 .Rproj.user
 .Rhistory
 .Rprofile
+.Renviron
 .RData
 .DS_Store
 inst/doc
