@@ -74,4 +74,7 @@ app_server <- function(input, output, session) {
 
   # ── Module: Gene Viewer ----------------──────-----------------
   mod_gene_viewer_server("gene_viewer", location = viewer_location, db_con)
+
+  # ── Module: Caulo Chat ----------------──────-----------------
+  mod_caulochat_server("caulochat_1", db_con)
 }

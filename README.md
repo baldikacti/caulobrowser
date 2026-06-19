@@ -18,16 +18,7 @@ crescentus*. It reimplements and extends the original
 [CauloBrowser](https://doi.org/10.1093/nar/gkv1050) web resource using
 modern R tooling.
 
-## Features
-
-| Feature                                 | CauloBrowser Section | Status     |
-|-----------------------------------------|----------------------|------------|
-| Gene search (name, locus tag, CC tag)   | Start page           | ✅         |
-| Gene overview table with external links | Section 1            | ✅         |
-| Time-resolved expression profiles       | Section 2            | ✅         |
-| Differential expression heatmap         | Section 3            | ✅         |
-| Genome browser (multi-track viewer)     | Section 4            | ✅         |
-| Data download (CSV)                     | Download page        | 🔜 Planned |
+The hosted app can be found at: <https://caulobrowser.org>
 
 ## Installation
 

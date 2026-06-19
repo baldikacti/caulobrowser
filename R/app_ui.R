@@ -104,6 +104,12 @@ app_ui <- function(request) {
         mod_gene_viewer_ui("gene_viewer")
       ),
 
+      # ──Caulo Chat tab --───────────────────────────────────
+      bslib::nav_panel(
+        title = "CauloChat (Alpha)",
+        mod_caulochat_ui("caulochat_1")
+      ),
+
       # ── About / Help tab ───────────────────────────────────
       bslib::nav_panel(
         title = "About",

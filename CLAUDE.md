@@ -66,7 +66,8 @@ Read the database schema from [here](DATABASE_SCHEMA.md).
 | `R/mod_overview_table.R` | `mod_overview_table` | Reactable gene summary table with external DB links |
 | `R/mod_expression.R`     | `mod_expression`     | Expression plots (ggiraph), strain selector         |
 | `R/mod_de_heatmap.R`     | `mod_de_heatmap`     | Comparison heatmaps (ggiraph), data_type selector   |
-| `R/mod_gene_viewer.R`     | `mod_gene_viewer`     | Jbrowse-based IGV-like gene viewer   |
+| `R/mod_gene_viewer.R`     | `mod_gene_viewer`     | Jbrowse-based IGV-like gene viewer                  |
+| `R/mod_caulochat.R`      | `mod_caulochat`      | AI chat interface (querychat/ellmer) for DB queries |
 
 ### Plotting
 
