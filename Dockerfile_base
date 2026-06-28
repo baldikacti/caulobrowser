@@ -13,12 +13,13 @@ RUN apt-get update -y && apt-get install -y \
     zlib1g-dev \
     libssl-dev \
     libuv1-dev \
-    libcurl4-openssl-dev \
+    libcurl4-openssl-dev curl \
     librsvg2-dev \
     libmagick++-dev \
     && rm -rf /var/lib/apt/lists/*
 # Install rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
 # Setup pelican binary
 RUN mkdir -p /usr/local/bin && \
     case "$TARGETARCH" in \
