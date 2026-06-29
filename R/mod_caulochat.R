@@ -44,6 +44,46 @@ mod_caulochat_ui <- function(id) {
   qc <- make_caulochat_qc()
   bslib::page_sidebar(
     title = "Caulo Chat",
+    shiny::tags$style(
+      "
+      .caulochat-bs-tt .tooltip-inner {
+        font-size: 0.9rem;
+        max-width: 450px;
+        text-align: left;
+        white-space: pre-wrap;
+        word-break: break-word;
+        line-height: 1.45;
+      }
+    "
+    ),
+    shiny::tags$script(shiny::HTML(
+      "
+      (function () {
+        function debounce(fn, ms) {
+          var t;
+          return function () { clearTimeout(t); t = setTimeout(fn, ms); };
+        }
+        function initTooltips() {
+          if (typeof bootstrap === 'undefined') return;
+          document.querySelectorAll('[data-bs-toggle=\"tooltip\"]:not(.tt-ready)').forEach(function (el) {
+            el.classList.add('tt-ready');
+            new bootstrap.Tooltip(el, {
+              trigger: 'hover',
+              boundary: 'window',
+              customClass: 'caulochat-bs-tt',
+              title: function () {
+                return this.scrollWidth > this.clientWidth
+                  ? this.getAttribute('data-bs-title')
+                  : '';
+              }
+            });
+          });
+        }
+        new MutationObserver(debounce(initTooltips, 150))
+          .observe(document.documentElement, { childList: true, subtree: true });
+      })();
+    "
+    )),
     sidebar = qc$sidebar(width = 400, id = ns(qc$id)),
     bslib::card(
       full_screen = TRUE,
@@ -78,17 +118,15 @@ mod_caulochat_server <- function(id, db_con) {
             highlight = TRUE,
             compact = TRUE,
             defaultColDef = reactable::colDef(
-              maxWidth = 300,
-              style = list(
-                whiteSpace = "nowrap",
-                overflow = "hidden",
-                textOverflow = "ellipsis"
-              ),
+              maxWidth = 400,
               html = TRUE,
               cell = reactable::JS(
                 "function(cellInfo) {
                   var val = cellInfo.value == null ? '' : String(cellInfo.value);
-                  return '<span title=\"' + val.replace(/\"/g, '&quot;') + '\">' + val + '</span>';
+                  var esc = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');
+                  return '<span data-bs-toggle=\"tooltip\" data-bs-title=\"' + esc + '\" ' +
+                    'style=\"display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:default;\">' +
+                    esc + '</span>';
                 }"
               )
             ),
