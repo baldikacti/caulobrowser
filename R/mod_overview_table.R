@@ -253,7 +253,7 @@ mod_overview_table_server <- function(id, gene_results, db_con) {
         bordered = TRUE,
         striped = FALSE,
         compact = TRUE,
-        defaultPageSize = 20,
+        pagination = FALSE,
         theme = reactable::reactableTheme(
           headerStyle = list(
             backgroundColor = "#2c3e50",
