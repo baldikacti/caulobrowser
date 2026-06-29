@@ -84,7 +84,7 @@ mod_caulochat_ui <- function(id) {
       })();
     "
     )),
-    sidebar = qc$sidebar(width = 400, id = ns(qc$id)),
+    sidebar = qc$sidebar(width = 800, id = ns(qc$id)),
     bslib::card(
       full_screen = TRUE,
       bslib::card_header("Results"),
