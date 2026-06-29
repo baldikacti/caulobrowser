@@ -1,3 +1,9 @@
+# caulobrowser 0.8.0
+
+* Fixes CauloChat bug and improves system prompts.
+* Improves CauloChat reactable table styling.
+* Fixes Docker container system dependency issues.
+
 # caulobrowser 0.7.0
 
 - Adds the alpha version of the CauloChat feature.
