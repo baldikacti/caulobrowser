@@ -1,6 +1,16 @@
 # Package-level cache: populated on first runtime call, never at load time.
 .qc_cache <- new.env(parent = emptyenv())
 
+#' Raw greeting content shown at chat startup.
+#' @noRd
+caulochat_greeting_html <- function() {
+  readLines(
+    system.file("prompts", "greeting.md", package = "caulobrowser"),
+    warn = FALSE
+  ) |>
+    paste(collapse = "\n")
+}
+
 #' Return the process-level QueryChat singleton, creating it on first call.
 #' @noRd
 make_caulochat_qc <- function() {
@@ -8,7 +18,7 @@ make_caulochat_qc <- function() {
     .qc_cache$qc <- querychat::QueryChat$new(
       NULL,
       "genes",
-      client = ellmer::chat_anthropic(model = "claude-sonnet-4-6"),
+      client = ellmer::chat_anthropic(model = "claude-sonnet-5"),
       data_description = readLines(
         system.file("prompts", "data_description.md", package = "caulobrowser"),
         warn = FALSE
@@ -19,11 +29,7 @@ make_caulochat_qc <- function() {
         warn = FALSE
       ) |>
         paste(collapse = "\n"),
-      greeting = readLines(
-        system.file("prompts", "greeting.md", package = "caulobrowser"),
-        warn = FALSE
-      ) |>
-        paste(collapse = "\n"),
+      greeting = caulochat_greeting_html(),
       tools = c("filter", "query", "visualize")
     )
   }
@@ -84,7 +90,16 @@ mod_caulochat_ui <- function(id) {
       })();
     "
     )),
-    sidebar = qc$sidebar(width = 800, id = ns(qc$id)),
+    sidebar = qc$sidebar(
+      shiny::downloadButton(
+        ns("download_transcript"),
+        label = "Download chat",
+        icon = shiny::icon("download"),
+        class = "btn-sm btn-outline-secondary w-100 mb-2"
+      ),
+      width = 600,
+      id = ns(qc$id)
+    ),
     bslib::card(
       full_screen = TRUE,
       bslib::card_header("Results"),
@@ -106,10 +121,13 @@ mod_caulochat_ui <- function(id) {
 #' @noRd
 mod_caulochat_server <- function(id, db_con) {
   moduleServer(id, function(input, output, session) {
+    qc_state <- shiny::reactiveVal(NULL)
+
     shiny::observeEvent(
       db_con(),
       {
         qc_vals <- .qc_cache$qc$server(data_source = db_con())
+        qc_state(qc_vals)
         output$dt <- reactable::renderReactable(
           reactable::reactable(
             qc_vals$df(),
@@ -139,6 +157,29 @@ mod_caulochat_server <- function(id, db_con) {
       },
       ignoreNULL = TRUE,
       once = TRUE
+    )
+
+    output$download_transcript <- shiny::downloadHandler(
+      filename = function() {
+        qc_vals <- qc_state()
+        chat_export_filename(
+          title = if (!is.null(qc_vals)) qc_vals$title() %||% NULL else NULL
+        )
+      },
+      content = function(file) {
+        qc_vals <- qc_state()
+        turns <- if (!is.null(qc_vals) && !is.null(qc_vals$client)) {
+          qc_vals$client$get_turns()
+        } else {
+          list()
+        }
+        transcript <- format_chat_transcript(
+          turns = turns,
+          greeting = caulochat_greeting_html(),
+          title = if (!is.null(qc_vals)) qc_vals$title() %||% NULL else NULL
+        )
+        writeLines(transcript, file, useBytes = TRUE)
+      }
     )
   })
 }
