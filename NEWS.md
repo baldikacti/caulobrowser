@@ -1,3 +1,8 @@
+# caulobrowser 0.9.0
+
+* Adds ability to download Caulochat history.
+* Updates the Caulochat model to `claude-sonnet-5`
+
 # caulobrowser 0.8.0
 
 * Fixes CauloChat bug and improves system prompts.
