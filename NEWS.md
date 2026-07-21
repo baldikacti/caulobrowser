@@ -1,3 +1,7 @@
+# caulobrowser 0.9.1
+
+* Fixes the ClaudeChat base_url
+
 # caulobrowser 0.9.0
 
 * Adds ability to download Caulochat history.
