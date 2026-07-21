@@ -18,7 +18,10 @@ make_caulochat_qc <- function() {
     .qc_cache$qc <- querychat::QueryChat$new(
       NULL,
       "genes",
-      client = ellmer::chat_anthropic(model = "claude-sonnet-5"),
+      client = ellmer::chat_anthropic(
+        model = "claude-sonnet-5",
+        base_url = "https://thekeymaker.umass.edu/v1"
+      ),
       data_description = readLines(
         system.file("prompts", "data_description.md", package = "caulobrowser"),
         warn = FALSE
