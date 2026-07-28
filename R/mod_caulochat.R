@@ -19,7 +19,7 @@ make_caulochat_qc <- function() {
       NULL,
       "genes",
       client = ellmer::chat_anthropic(
-        model = "claude-sonnet-5",
+        model = "claude-sonnet-4-6",
         base_url = "https://thekeymaker.umass.edu/v1"
       ),
       data_description = readLines(
