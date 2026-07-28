@@ -52,6 +52,29 @@ test_that("na_or returns custom fallback when provided", {
   expect_equal(na_or(NA, or = "N/A"), "N/A")
 })
 
+test_that("na_or with md = TRUE renders a markdown link as an anchor", {
+  result <- as.character(na_or("See [the paper](https://example.com).", md = TRUE))
+  expect_match(
+    result,
+    '<a href="https://example.com">the paper</a>',
+    fixed = TRUE
+  )
+})
+
+test_that("na_or with md = TRUE keeps plain text intact", {
+  expect_match(
+    as.character(na_or("No links here", md = TRUE)),
+    "No links here",
+    fixed = TRUE
+  )
+})
+
+test_that("na_or with md = TRUE still returns the fallback for missing values", {
+  expect_equal(na_or(NA, md = TRUE), "—")
+  expect_equal(na_or(NULL, md = TRUE), "—")
+  expect_equal(na_or("", md = TRUE), "—")
+})
+
 # ── make_row ──────────────────────────────────────────────────────────────────
 
 test_that("make_row returns a shiny.tag", {

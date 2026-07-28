@@ -22,7 +22,7 @@ test_that("download_transcript produces a markdown file before any conversation"
     args = list(
       db_con = shiny::reactiveVal(DBI::dbConnect(
         duckdb::duckdb(),
-        system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+        test_db_path()
       ))
     ),
     {

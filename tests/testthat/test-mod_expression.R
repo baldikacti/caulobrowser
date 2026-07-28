@@ -20,18 +20,14 @@ testServer(
       search_genes(
         DBI::dbConnect(
           duckdb::duckdb(),
-          system.file(
-            "extdata",
-            "caulobrowser.duckdb",
-            package = "caulobrowser"
-          )
+          test_db_path()
         ),
         "CCNA_01248"
       )
     ),
     db_con = shiny::reactiveVal(DBI::dbConnect(
       duckdb::duckdb(),
-      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+      test_db_path()
     ))
   ),
   {
@@ -50,18 +46,14 @@ testServer(
       search_genes(
         DBI::dbConnect(
           duckdb::duckdb(),
-          system.file(
-            "extdata",
-            "caulobrowser.duckdb",
-            package = "caulobrowser"
-          )
+          test_db_path()
         ),
         "CCNA_00090,CCNA_01248"
       )
     ),
     db_con = shiny::reactiveVal(DBI::dbConnect(
       duckdb::duckdb(),
-      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+      test_db_path()
     ))
   ),
   {
@@ -80,18 +72,14 @@ testServer(
       search_genes(
         DBI::dbConnect(
           duckdb::duckdb(),
-          system.file(
-            "extdata",
-            "caulobrowser.duckdb",
-            package = "caulobrowser"
-          )
+          test_db_path()
         ),
         "CCNA_00090"
       )
     ),
     db_con = shiny::reactiveVal(DBI::dbConnect(
       duckdb::duckdb(),
-      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+      test_db_path()
     ))
   ),
   {
@@ -112,18 +100,14 @@ testServer(
       search_genes(
         DBI::dbConnect(
           duckdb::duckdb(),
-          system.file(
-            "extdata",
-            "caulobrowser.duckdb",
-            package = "caulobrowser"
-          )
+          test_db_path()
         ),
         "CCNA_00090"
       )
     ),
     db_con = shiny::reactiveVal(DBI::dbConnect(
       duckdb::duckdb(),
-      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+      test_db_path()
     ))
   ),
   {
@@ -141,18 +125,14 @@ testServer(
       search_genes(
         DBI::dbConnect(
           duckdb::duckdb(),
-          system.file(
-            "extdata",
-            "caulobrowser.duckdb",
-            package = "caulobrowser"
-          )
+          test_db_path()
         ),
         "CCNA_00090,CCNA_01248"
       )
     ),
     db_con = shiny::reactiveVal(DBI::dbConnect(
       duckdb::duckdb(),
-      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+      test_db_path()
     ))
   ),
   {

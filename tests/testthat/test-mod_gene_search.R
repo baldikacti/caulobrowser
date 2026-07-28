@@ -20,7 +20,7 @@ testServer(
   args = list(
     db_con = shiny::reactiveVal(DBI::dbConnect(
       duckdb::duckdb(),
-      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+      test_db_path()
     ))
   ),
   {
@@ -36,7 +36,7 @@ testServer(
   args = list(
     db_con = shiny::reactiveVal(DBI::dbConnect(
       duckdb::duckdb(),
-      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+      test_db_path()
     ))
   ),
   {
@@ -53,7 +53,7 @@ testServer(
   args = list(
     db_con = shiny::reactiveVal(DBI::dbConnect(
       duckdb::duckdb(),
-      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+      test_db_path()
     ))
   ),
   {
@@ -69,7 +69,7 @@ testServer(
   args = list(
     db_con = shiny::reactiveVal(DBI::dbConnect(
       duckdb::duckdb(),
-      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+      test_db_path()
     ))
   ),
   {
@@ -85,7 +85,7 @@ testServer(
   args = list(
     db_con = shiny::reactiveVal(DBI::dbConnect(
       duckdb::duckdb(),
-      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+      test_db_path()
     ))
   ),
   {

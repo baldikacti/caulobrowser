@@ -20,11 +20,7 @@ testServer(
       search_genes(
         DBI::dbConnect(
           duckdb::duckdb(),
-          system.file(
-            "extdata",
-            "caulobrowser.duckdb",
-            package = "caulobrowser"
-          )
+          test_db_path()
         ),
         "CCNA_01248"
       )
@@ -32,7 +28,7 @@ testServer(
     dtype_filter = c("rnaseq"),
     db_con = shiny::reactiveVal(DBI::dbConnect(
       duckdb::duckdb(),
-      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+      test_db_path()
     ))
   ),
   {
@@ -60,11 +56,7 @@ testServer(
       search_genes(
         DBI::dbConnect(
           duckdb::duckdb(),
-          system.file(
-            "extdata",
-            "caulobrowser.duckdb",
-            package = "caulobrowser"
-          )
+          test_db_path()
         ),
         "CCNA_00090"
       )
@@ -72,7 +64,7 @@ testServer(
     dtype_filter = c("rnaseq"),
     db_con = shiny::reactiveVal(DBI::dbConnect(
       duckdb::duckdb(),
-      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+      test_db_path()
     ))
   ),
   {
@@ -82,7 +74,7 @@ testServer(
   }
 )
 
-# de_data returns 0 rows when dtype has no data in the demo DB
+# de_data returns 0 rows when dtype matches no experiment
 testServer(
   mod_de_heatmap_server,
   args = list(
@@ -90,19 +82,15 @@ testServer(
       search_genes(
         DBI::dbConnect(
           duckdb::duckdb(),
-          system.file(
-            "extdata",
-            "caulobrowser.duckdb",
-            package = "caulobrowser"
-          )
+          test_db_path()
         ),
         "CCNA_00090"
       )
     ),
-    dtype_filter = c("tnseq"),
+    dtype_filter = c("not_a_data_type"),
     db_con = shiny::reactiveVal(DBI::dbConnect(
       duckdb::duckdb(),
-      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+      test_db_path()
     ))
   ),
   {
@@ -120,11 +108,7 @@ testServer(
       search_genes(
         DBI::dbConnect(
           duckdb::duckdb(),
-          system.file(
-            "extdata",
-            "caulobrowser.duckdb",
-            package = "caulobrowser"
-          )
+          test_db_path()
         ),
         "notAGene"
       )
@@ -132,7 +116,7 @@ testServer(
     dtype_filter = c("rnaseq"),
     db_con = shiny::reactiveVal(DBI::dbConnect(
       duckdb::duckdb(),
-      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+      test_db_path()
     ))
   ),
   {
@@ -149,11 +133,7 @@ testServer(
       search_genes(
         DBI::dbConnect(
           duckdb::duckdb(),
-          system.file(
-            "extdata",
-            "caulobrowser.duckdb",
-            package = "caulobrowser"
-          )
+          test_db_path()
         ),
         "CCNA_00090"
       )
@@ -161,7 +141,7 @@ testServer(
     dtype_filter = c("rnaseq"),
     db_con = shiny::reactiveVal(DBI::dbConnect(
       duckdb::duckdb(),
-      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+      test_db_path()
     ))
   ),
   {
@@ -170,7 +150,7 @@ testServer(
   }
 )
 
-# plot_height_px returns 200 when dtype has no data
+# plot_height_px returns 200 when dtype matches no experiment
 testServer(
   mod_de_heatmap_server,
   args = list(
@@ -178,19 +158,15 @@ testServer(
       search_genes(
         DBI::dbConnect(
           duckdb::duckdb(),
-          system.file(
-            "extdata",
-            "caulobrowser.duckdb",
-            package = "caulobrowser"
-          )
+          test_db_path()
         ),
         "CCNA_01248"
       )
     ),
-    dtype_filter = c("tnseq"),
+    dtype_filter = c("not_a_data_type"),
     db_con = shiny::reactiveVal(DBI::dbConnect(
       duckdb::duckdb(),
-      system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+      test_db_path()
     ))
   ),
   {

@@ -40,27 +40,18 @@ remotes::install_github("baldikacti/caulobrowser")
 
 ### Without Docker (R)
 
-1. Retrieve the demo database path that is bundled with the package or download the real database using [Pelican](https://docs.pelicanplatform.org/install):
+1. Download the database using [Pelican](https://docs.pelicanplatform.org/install):
 
-**Demo database**
-```r
-system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
-```
-This creates a `caulobrowser.duckdb` file with demo data for 5 genes
-(ctrA, ftsZ, popZ, dnaA, ccrM) including expression time-courses and
-differential expression results.
-
-**Real database**
 ```bash
 pelican object get 'osdf:///unity-hpc/caulobrowser/caulobrowser.duckdb?directread' .
 ```
 
-This downloads the real app database to the current directory. (Dot represents current directory)
+This downloads the app database to the current directory. (Dot represents current directory)
 
 2. Run the app:
 
 ```r
-# Set CAULOBROWSER_DB_PATH to where your database is
+# The app has no bundled database; CAULOBROWSER_DB_PATH must point to yours
 Sys.setenv("CAULOBROWSER_DB_PATH" = "/path/to/caulobrowser.duckdb")
 caulobrowser::run_app()
 # Or during development:

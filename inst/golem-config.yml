@@ -2,9 +2,9 @@ default:
   golem_name: caulobrowser
   golem_version: 0.1.0
   app_prod: no
-  db_path: !expr Sys.getenv("CAULOBROWSER_DB_PATH", system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser"))
+  db_path: !expr Sys.getenv("CAULOBROWSER_DB_PATH")
 production:
   app_prod: yes
-  db_path: !expr Sys.getenv("CAULOBROWSER_DB_PATH", system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser"))
+  db_path: !expr Sys.getenv("CAULOBROWSER_DB_PATH")
 dev:
   golem_wd: !expr golem::pkg_path()

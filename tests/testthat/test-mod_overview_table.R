@@ -20,11 +20,7 @@ testServer(
       search_genes(
         DBI::dbConnect(
           duckdb::duckdb(),
-          system.file(
-            "extdata",
-            "caulobrowser.duckdb",
-            package = "caulobrowser"
-          )
+          test_db_path()
         ),
         "CCNA_01248"
       )
@@ -47,11 +43,7 @@ testServer(
       search_genes(
         DBI::dbConnect(
           duckdb::duckdb(),
-          system.file(
-            "extdata",
-            "caulobrowser.duckdb",
-            package = "caulobrowser"
-          )
+          test_db_path()
         ),
         "CCNA_01248"
       )
@@ -74,11 +66,7 @@ testServer(
       search_genes(
         DBI::dbConnect(
           duckdb::duckdb(),
-          system.file(
-            "extdata",
-            "caulobrowser.duckdb",
-            package = "caulobrowser"
-          )
+          test_db_path()
         ),
         "CCNA_00090,CCNA_01248"
       )
@@ -101,11 +89,7 @@ testServer(
       search_genes(
         DBI::dbConnect(
           duckdb::duckdb(),
-          system.file(
-            "extdata",
-            "caulobrowser.duckdb",
-            package = "caulobrowser"
-          )
+          test_db_path()
         ),
         "ctrA"
       )
@@ -125,11 +109,7 @@ testServer(
       search_genes(
         DBI::dbConnect(
           duckdb::duckdb(),
-          system.file(
-            "extdata",
-            "caulobrowser.duckdb",
-            package = "caulobrowser"
-          )
+          test_db_path()
         ),
         "ctrA"
       )
