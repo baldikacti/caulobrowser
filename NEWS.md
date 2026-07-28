@@ -1,3 +1,7 @@
+# caulobrowser 0.9.3
+
+- Changes the caulochat model to `claude-sonnet-4-6`.
+
 # caulobrowser 0.9.2
 
 * Removes the bundled example DuckDB database from `inst/extdata`; the database
