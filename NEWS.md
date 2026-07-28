@@ -1,4 +1,4 @@
-# caulobrowser (development version)
+# caulobrowser 0.9.2
 
 * Removes the bundled example DuckDB database from `inst/extdata`; the database
   path now comes solely from the `CAULOBROWSER_DB_PATH` environment variable.
