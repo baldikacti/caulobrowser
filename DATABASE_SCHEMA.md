@@ -74,6 +74,7 @@ The app reads from a DuckDB database with six tables.
 | `lab_group` | VARCHAR | |
 | `doi` | VARCHAR | |
 | `geo_id` | VARCHAR | |
+| `notes` | VARCHAR | |
 | `date_added` | VARCHAR | |
 
 ## experiment_conditions

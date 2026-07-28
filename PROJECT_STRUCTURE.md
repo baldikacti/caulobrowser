@@ -22,8 +22,7 @@ caulobrowser/
 │   └── run_dev.R            # Quick launch
 ├── inst/
 │   ├── app/www/             # Static assets (CSS, favicon)
-│   ├── extdata/             # DuckDB database file
-│   └── golem-config.yml     # App configuration
+│   └── golem-config.yml     # App configuration (db path from CAULOBROWSER_DB_PATH)
 ├── tests/
 │   └── testthat/            # Unit tests
 └── app.R                    # Deployment entry point

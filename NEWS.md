@@ -1,3 +1,11 @@
+# caulobrowser (development version)
+
+* Removes the bundled example DuckDB database from `inst/extdata`; the database
+  path now comes solely from the `CAULOBROWSER_DB_PATH` environment variable.
+  Database-backed tests skip when it is unset.
+* Renders the experiment `Notes` field as markdown, so `[text](url)` links
+  display as links.
+
 # caulobrowser 0.9.1
 
 * Fixes the ClaudeChat base_url

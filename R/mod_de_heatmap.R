@@ -18,6 +18,14 @@ mod_de_heatmap_ui <- function(id) {
   ns <- shiny::NS(id)
 
   shiny::tagList(
+    # Markdown-rendered cells (e.g. Notes) wrap text in <p>; drop its margin so
+    # the details table keeps its compact row spacing.
+    shiny::tags$style(shiny::HTML(
+      sprintf(
+        "#%s td p:last-child { margin-bottom: 0; }",
+        ns("experiment_panel")
+      )
+    )),
     shiny::p(
       class = "text-muted",
       "Log\u00b2 fold-change values from comparison experiments.",
@@ -151,17 +159,6 @@ mod_de_heatmap_server <- function(id, gene_results, dtype_filter, db_con) {
       df <- de_data()
       row <- df[df$experiment_id == selected_id, ][1, ]
 
-      doi_val <- row$doi
-      doi_cell <- if (is_present(doi_val)) {
-        shiny::tags$a(
-          href = paste0("https://doi.org/", doi_val),
-          target = "_blank",
-          doi_val
-        )
-      } else {
-        shiny::span("\u2014")
-      }
-
       bslib::card(
         style = "font-size: 0.85em;",
         bslib::card_header("Experiment details"),
@@ -187,7 +184,8 @@ mod_de_heatmap_server <- function(id, gene_results, dtype_filter, db_con) {
               make_row("Reference Growth phase:", na_or(row$ref_growth_phase)),
               make_row("Statistic Method:", na_or(row$stat_method)),
               make_row("Lab group:", na_or(row$lab_group)),
-              make_row("DOI:", doi_cell)
+              make_row("DOI:", na_or(row$doi, md = TRUE)),
+              make_row("Notes:", na_or(row$notes, md = TRUE))
             )
           )
         )

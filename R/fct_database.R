@@ -9,13 +9,11 @@
 get_db_connection <- function() {
   db_path <- get_golem_config("db_path")
 
-  # system.file() silently returns "" when the package is not found
+  # No database ships with the package; the path comes from the environment
   if (!nzchar(db_path)) {
     stop(
       "Database path could not be resolved.\n",
-      "  Set the CAULOBROWSER_DB_PATH environment variable to an existing .duckdb file, or\n",
-      "  use `system.file('extdata', 'caulobrowser.duckdb', package = 'caulobrowser')` to retrieve the demo database path.\n",
-      "  Set the CAULOBROWSER_DB_PATH variable to the demo database path",
+      "  Set the CAULOBROWSER_DB_PATH environment variable to an existing .duckdb file.",
       call. = FALSE
     )
   }
@@ -25,9 +23,7 @@ get_db_connection <- function() {
       "Database file not found: ",
       db_path,
       "\n",
-      "  Set the CAULOBROWSER_DB_PATH environment variable to an existing .duckdb file, or\n",
-      "  use `system.file('extdata', 'caulobrowser.duckdb', package = 'caulobrowser')` to retrieve the demo database path.\n",
-      "  Set the CAULOBROWSER_DB_PATH variable to the demo database path",
+      "  Set the CAULOBROWSER_DB_PATH environment variable to an existing .duckdb file.",
       call. = FALSE
     )
   }
@@ -306,6 +302,7 @@ get_de_results_for_heatmap <- function(con, gene_ids, data_type = NULL) {
        exp.lab_group,
        exp.doi,
        exp.geo_id,
+       exp.notes,
        dr.log2fc,
        dr.stat_value
      FROM de_results dr

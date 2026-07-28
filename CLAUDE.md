@@ -14,12 +14,15 @@ golem::run_dev()
 caulobrowser::run_app()
 ```
 
-### Connect to demo database
+### Connect to the database
+
+No database ships with the package — `CAULOBROWSER_DB_PATH` must point to a
+`.duckdb` file (set in `.Rprofile` for local development).
 
 ```r
 con <- DBI::dbConnect(
     duckdb::duckdb(),
-    system.file("extdata", "caulobrowser.duckdb", package = "caulobrowser")
+    Sys.getenv("CAULOBROWSER_DB_PATH")
   )
 ```
 
@@ -50,7 +53,7 @@ CauloBrowser is a **golem-based R package** that exposes a single Shiny app via 
 
 ### Data layer
 
-All data lives in a **DuckDB** embedded database opened in read-only mode per session. The database path is configured via the `CAULOBROWSER_DB_PATH` environment variable (set in `dev/run_dev.R`). 
+All data lives in a **DuckDB** embedded database opened in read-only mode per session. No database is bundled with the package: the path comes solely from the `CAULOBROWSER_DB_PATH` environment variable (set in `.Rprofile` locally, in the `Dockerfile` for containers). Database-backed tests skip when it is unset. 
 
 Read the database schema from [here](DATABASE_SCHEMA.md).
 
@@ -80,4 +83,4 @@ Read the database schema from [here](DATABASE_SCHEMA.md).
 
 ### Configuration
 
-`inst/golem-config.yml` is read by `get_golem_config()` from `R/app_config.R`. The `default` block sets the database path; environment-specific overrides (`production`, etc.) can be added there.
+`inst/golem-config.yml` is read by `get_golem_config()` from `R/app_config.R`. The `default` block reads the database path from `CAULOBROWSER_DB_PATH` (no fallback); environment-specific overrides (`production`, etc.) can be added there.

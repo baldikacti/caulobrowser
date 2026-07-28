@@ -31,10 +31,18 @@ is_present <- function(x) {
 #' @param or The fallback value to return when `x` is `NULL`, `NA`, or empty.
 #'   Defaults to `"—"` (em-dash).
 #'
-#' @return `x` if it is non-`NULL`, non-`NA`, and non-empty; otherwise `or`.
+#' @param md Logical. When `TRUE`, a present value is passed through
+#'   [shiny::markdown()] so free-text fields containing markdown (e.g.
+#'   `[text](url)` links) render as HTML. Defaults to `FALSE`.
+#'
+#' @return `x` (rendered as markdown when `md = TRUE`) if it is non-`NULL`,
+#'   non-`NA`, and non-empty; otherwise `or`.
 #' @noRd
-na_or <- function(x, or = "\u2014") {
-  if (is_present(x)) x else or
+na_or <- function(x, or = "\u2014", md = FALSE) {
+  if (!is_present(x)) {
+    return(or)
+  }
+  if (md) shiny::markdown(x) else x
 }
 
 #' Test whether a scalar is NA or empty string

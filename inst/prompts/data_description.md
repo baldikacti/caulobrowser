@@ -87,6 +87,7 @@ One row per experiment (a comparison or timecourse). All expression and fitness 
 | `lab_group` | VARCHAR | Lab or research group that performed the experiment. |
 | `doi` | VARCHAR | DOI of the publication that reported this experiment. |
 | `geo_id` | VARCHAR | GEO (Gene Expression Omnibus) or other repository accession for raw data. |
+| `notes` | VARCHAR | Contains additional notes regarding the experiment. |
 | `date_added` | VARCHAR | Date the experiment was curated and added to the database. |
 
 ---

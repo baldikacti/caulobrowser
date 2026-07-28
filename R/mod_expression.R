@@ -152,16 +152,6 @@ mod_expression_server <- function(id, gene_results, db_con) {
           strain_val <- exps$strain[i]
           output_id <- paste0("plot_", exp_id)
 
-          doi_cell <- if (is_present(doi_val)) {
-            shiny::tags$a(
-              href = paste0("https://doi.org/", doi_val),
-              target = "_blank",
-              doi_val
-            )
-          } else {
-            shiny::span("\u2014")
-          }
-
           info_panel <- bslib::card(
             style = "font-size: 0.85em; height: 100%;",
             bslib::card_header("Experiment details"),
@@ -172,7 +162,7 @@ mod_expression_server <- function(id, gene_results, db_con) {
                   make_row("Treatment level:", na_or(treatment_val)),
                   make_row("Media:", na_or(media_val)),
                   make_row("Strain:", na_or(strain_val)),
-                  make_row("DOI:", doi_cell)
+                  make_row("DOI:", na_or(doi_val, md = TRUE))
                 )
               )
             )

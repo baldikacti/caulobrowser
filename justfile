@@ -26,11 +26,11 @@ test:
 
 # Build base docker container
 build_docker_base:
-    docker build --platform linux/amd64,linux/arm64 -f Dockerfile_base -t baldikacti/caulobrowser_base:latest .
+    docker build --platform linux/arm64 -f Dockerfile_base -t baldikacti/caulobrowser_base:latest .
 
 # Build runtime docker container
 build_docker_runtime arg: build_r
-    docker build --platform linux/amd64,linux/arm64 --build-arg BASE_IMAGE={{arg}} -f Dockerfile -t baldikacti/caulobrowser:latest -t baldikacti/caulobrowser:{{version}} .
+    docker build --platform linux/arm64 --build-arg BASE_IMAGE={{arg}} -f Dockerfile -t baldikacti/caulobrowser:latest -t baldikacti/caulobrowser:{{version}} .
 
 # Push the docker container to DockerHub
 push_docker:
@@ -42,7 +42,7 @@ run_docker database_path:
         --rm \
         -p 3838:3838 \
         -v {{database_path}}:/database/caulobrowser.duckdb \
-        ghcr.io/baldikacti/caulobrowser:{{version}}
+        baldikacti/caulobrowser:{{version}}
 
 # Tag release from DESCRIPTION version with NEWS.md entry as message
 tag_release:
