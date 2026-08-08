@@ -62,7 +62,12 @@ app_server <- function(input, output, session) {
   mod_expression_server("expression", gene_results, db_con)
 
   # ── Module: Expression Browser (Section 3) ───---------------──
-  mod_de_heatmap_server("expression_heatmap", gene_results, c("rnaseq"), db_con)
+  mod_de_heatmap_server(
+    "expression_heatmap",
+    gene_results,
+    c("rnaseq", "microarray"),
+    db_con
+  )
 
   # ── Module: Fitness Browser (Section 4) ──────-----------------
   mod_de_heatmap_server("fitness_heatmap", gene_results, c("tnseq"), db_con)

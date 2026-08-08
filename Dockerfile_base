@@ -4,6 +4,9 @@ RUN apt-get update -y && apt-get install -y \
     wget \
     tar \
     make \
+    cmake \
+    libnode-dev \
+    unixodbc-dev \
     xz-utils \
     libcairo2-dev \
     libfontconfig1-dev \
