@@ -1,3 +1,8 @@
+# caulobrowser 0.10.0
+
+- Adds `microarray` experiments to expression heatmaps.
+- Database updated with 75 new experiments.
+
 # caulobrowser 0.9.3
 
 - Changes the caulochat model to `claude-sonnet-4-6`.
