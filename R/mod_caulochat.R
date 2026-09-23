@@ -26,10 +26,8 @@ caulochat_tables <- c(
 #' @noRd
 make_caulochat_qc <- function() {
   if (is.null(.qc_cache$qc)) {
-    .qc_cache$con <- get_db_connection()
     qc <- querychat::QueryChat$new(
-      .qc_cache$con,
-      caulochat_tables[[1]],
+      NULL,
       client = ellmer::chat_openai_compatible(
         model = "qwen3-8-27b",
         base_url = "https://litellm.harmonyhpc.io/v1"
@@ -44,10 +42,21 @@ make_caulochat_qc <- function() {
       tools = c("filter", "query", "visualize"),
       cleanup = FALSE
     )
-    qc$add_tables(.qc_cache$con, caulochat_tables[-1])
     .qc_cache$qc <- qc
   }
   .qc_cache$qc
+}
+
+#' Register the chat tables on a dedicated read-only connection, once per
+#' process. Called before the first `$server()`, so querychat treats it as
+#' initial configuration. Errors if the database is unavailable.
+#' @noRd
+caulochat_register_tables <- function(qc) {
+  if (length(qc$table_names()) == 0) {
+    .qc_cache$con <- get_db_connection()
+    qc$add_tables(.qc_cache$con, caulochat_tables)
+  }
+  invisible(qc)
 }
 
 #' caulochat UI Function
@@ -96,6 +105,18 @@ mod_caulochat_ui <- function(id) {
 mod_caulochat_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     qc <- make_caulochat_qc()
+    # Without a database there is nothing to chat about; app_server already
+    # reports the database error to the user.
+    registered <- tryCatch(
+      {
+        caulochat_register_tables(qc)
+        TRUE
+      },
+      error = function(e) FALSE
+    )
+    if (!registered) {
+      return(invisible(NULL))
+    }
     qc_vals <- qc$server()
 
     # Multi-table: show whichever table the chat last filtered

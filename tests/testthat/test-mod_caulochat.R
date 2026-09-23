@@ -1,6 +1,5 @@
 test_that("mod_caulochat_ui works", {
-  # Building the UI creates the QueryChat singleton, which opens the database.
-  test_db_path()
+  # Building the UI must not need the database.
   ui <- mod_caulochat_ui(id = "test")
   golem::expect_shinytaglist(ui)
   fmls <- formals(mod_caulochat_ui)
@@ -14,7 +13,7 @@ test_that("mod_caulochat_server has correct formals", {
 
 test_that("QueryChat registers every data-dict table", {
   test_db_path()
-  qc <- make_caulochat_qc()
+  qc <- caulochat_register_tables(make_caulochat_qc())
   expect_setequal(qc$table_names(), caulochat_tables)
 
   dict <- yaml::read_yaml(
@@ -24,13 +23,23 @@ test_that("QueryChat registers every data-dict table", {
 })
 
 test_that("UI is chat-first with a results drawer and transcript download", {
-  test_db_path()
   html <- as.character(mod_caulochat_ui(id = "test"))
   qc_id <- make_caulochat_qc()$id
   expect_match(html, paste0("test-", qc_id, "-chat"), fixed = TRUE)
   for (out in c("test-dt", "test-sql", "test-results_title", "test-download_transcript")) {
     expect_match(html, out, fixed = TRUE)
   }
+})
+
+test_that("chat server starts without a database", {
+  # Fresh QueryChat with no tables, restored afterwards.
+  old_qc <- .qc_cache$qc
+  .qc_cache$qc <- NULL
+  on.exit(.qc_cache$qc <- old_qc, add = TRUE)
+  local_mocked_bindings(get_db_connection = function() stop("no database"))
+
+  expect_no_error(testServer(mod_caulochat_server, session$flushReact()))
+  expect_length(.qc_cache$qc$table_names(), 0)
 })
 
 test_that("filtering a table opens the results drawer", {

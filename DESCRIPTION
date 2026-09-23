@@ -19,7 +19,7 @@ Imports:
     glue,
     golem,
     htmltools,
-    JBrowseR,
+    JBrowseR (>= 0.13.0),
     jsonlite,
     magick,
     querychat (>= 0.4.0),
@@ -38,7 +38,8 @@ Suggests:
     roxygen2,
     spelling,
     testthat (>= 3.0.0),
-    usethis
+    usethis,
+    yaml
 VignetteBuilder: 
     knitr
 Config/roxygen2/version: 8.1.0
@@ -47,3 +48,5 @@ Encoding: UTF-8
 Language: en-US
 LazyData: true
 Depends: R (>= 4.1.0)
+Remotes:
+    gmod/JBrowseR
