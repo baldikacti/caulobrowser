@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.5.3",
+    "Version": "4.6.1",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -91,19 +91,19 @@
       "Author": "Elliot Hershberg [aut] (ORCID: <https://orcid.org/0000-0003-2068-3366>), Colin Diesh [aut, cre] (ORCID: <https://orcid.org/0000-0003-2629-7570>), the JBrowse 2 Team [aut]",
       "Maintainer": "Colin Diesh <colin.diesh@gmail.com>",
       "RemoteType": "github",
+      "RemoteHost": "api.github.com",
       "RemoteUsername": "gmod",
       "RemoteRepo": "JBrowseR",
       "RemoteRef": "main",
-      "RemoteSha": "8ba85f31096315992e8a146f62f1f2230240b56d",
-      "RemoteHost": "api.github.com"
+      "RemoteSha": "8ba85f31096315992e8a146f62f1f2230240b56d"
     },
     "MASS": {
       "Package": "MASS",
-      "Version": "7.3-66",
+      "Version": "7.3-65",
       "Source": "Repository",
       "Priority": "recommended",
-      "Date": "2026-07-15",
-      "Revision": "$Rev: 3693 $",
+      "Date": "2025-02-19",
+      "Revision": "$Rev: 3681 $",
       "Depends": [
         "R (>= 4.4.0)",
         "grDevices",
