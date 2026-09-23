@@ -18,10 +18,7 @@ test_that("mod_gene_search_server has correct formals", {
 testServer(
   mod_gene_search_server,
   args = list(
-    db_con = shiny::reactiveVal(DBI::dbConnect(
-      duckdb::duckdb(),
-      test_db_path()
-    ))
+    db_con = shiny::reactiveVal(test_db_con())
   ),
   {
     ns <- session$ns
@@ -34,10 +31,7 @@ testServer(
 testServer(
   mod_gene_search_server,
   args = list(
-    db_con = shiny::reactiveVal(DBI::dbConnect(
-      duckdb::duckdb(),
-      test_db_path()
-    ))
+    db_con = shiny::reactiveVal(test_db_con())
   ),
   {
     session$setInputs(gene_query = "CCNA_00090", btn_search = 1)
@@ -51,10 +45,7 @@ testServer(
 testServer(
   mod_gene_search_server,
   args = list(
-    db_con = shiny::reactiveVal(DBI::dbConnect(
-      duckdb::duckdb(),
-      test_db_path()
-    ))
+    db_con = shiny::reactiveVal(test_db_con())
   ),
   {
     session$setInputs(gene_query = "notAGene", btn_search = 1)
@@ -67,10 +58,7 @@ testServer(
 testServer(
   mod_gene_search_server,
   args = list(
-    db_con = shiny::reactiveVal(DBI::dbConnect(
-      duckdb::duckdb(),
-      test_db_path()
-    ))
+    db_con = shiny::reactiveVal(test_db_con())
   ),
   {
     session$setInputs(gene_query = "CCNA_00090,CCNA_01248", btn_search = 1)
@@ -83,10 +71,7 @@ testServer(
 testServer(
   mod_gene_search_server,
   args = list(
-    db_con = shiny::reactiveVal(DBI::dbConnect(
-      duckdb::duckdb(),
-      test_db_path()
-    ))
+    db_con = shiny::reactiveVal(test_db_con())
   ),
   {
     session$setInputs(gene_query = "CCNA_00090", btn_search = 1)

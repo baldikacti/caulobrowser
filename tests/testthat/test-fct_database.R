@@ -1,10 +1,7 @@
 # ── search_genes ─────────────────────────────────────────────────────────────
 
 test_that("search_genes finds gene by name", {
-  con <- DBI::dbConnect(
-    duckdb::duckdb(),
-    test_db_path()
-  )
+  con <- test_db_con()
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
   result <- search_genes(con, "CCNA_00090")
@@ -13,10 +10,7 @@ test_that("search_genes finds gene by name", {
 })
 
 test_that("search_genes finds gene by gene_id (CCNA_ tag)", {
-  con <- DBI::dbConnect(
-    duckdb::duckdb(),
-    test_db_path()
-  )
+  con <- test_db_con()
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
   result <- search_genes(con, "CCNA_00090")
@@ -25,10 +19,7 @@ test_that("search_genes finds gene by gene_id (CCNA_ tag)", {
 })
 
 test_that("search_genes finds gene by cc_tag", {
-  con <- DBI::dbConnect(
-    duckdb::duckdb(),
-    test_db_path()
-  )
+  con <- test_db_con()
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
   result <- search_genes(con, "CC_0092")
@@ -36,10 +27,7 @@ test_that("search_genes finds gene by cc_tag", {
 })
 
 test_that("search_genes accepts comma-separated list of terms", {
-  con <- DBI::dbConnect(
-    duckdb::duckdb(),
-    test_db_path()
-  )
+  con <- test_db_con()
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
   result <- search_genes(con, "CCNA_00090,CCNA_01248")
@@ -47,10 +35,7 @@ test_that("search_genes accepts comma-separated list of terms", {
 })
 
 test_that("search_genes returns 0 rows for empty query", {
-  con <- DBI::dbConnect(
-    duckdb::duckdb(),
-    test_db_path()
-  )
+  con <- test_db_con()
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
   result <- search_genes(con, "")
@@ -58,10 +43,7 @@ test_that("search_genes returns 0 rows for empty query", {
 })
 
 test_that("search_genes returns 0 rows for no match", {
-  con <- DBI::dbConnect(
-    duckdb::duckdb(),
-    test_db_path()
-  )
+  con <- test_db_con()
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
   result <- search_genes(con, "notAGene")
@@ -72,10 +54,7 @@ test_that("search_genes returns 0 rows for no match", {
 # ── get_expression_data ───────────────────────────────────────────────────────
 
 test_that("get_expression_data returns correct columns and rows", {
-  con <- DBI::dbConnect(
-    duckdb::duckdb(),
-    test_db_path()
-  )
+  con <- test_db_con()
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
   result <- get_expression_data(con, "CCNA_00090")
@@ -98,10 +77,7 @@ test_that("get_expression_data returns correct columns and rows", {
 })
 
 test_that("get_expression_data filters by genetic_background", {
-  con <- DBI::dbConnect(
-    duckdb::duckdb(),
-    test_db_path()
-  )
+  con <- test_db_con()
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
   all_rows <- get_expression_data(con, "CCNA_00090")
@@ -122,10 +98,7 @@ test_that("get_expression_data filters by genetic_background", {
 })
 
 test_that("get_expression_data handles multiple gene_ids", {
-  con <- DBI::dbConnect(
-    duckdb::duckdb(),
-    test_db_path()
-  )
+  con <- test_db_con()
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
   result <- get_expression_data(con, c("CCNA_00090", "CCNA_00446"))
@@ -137,10 +110,7 @@ test_that("get_expression_data handles multiple gene_ids", {
 # ── get_timecourse_backgrounds ────────────────────────────────────────────────
 
 test_that("get_timecourse_backgrounds returns timecourse genetic backgrounds", {
-  con <- DBI::dbConnect(
-    duckdb::duckdb(),
-    test_db_path()
-  )
+  con <- test_db_con()
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
   result <- get_timecourse_backgrounds(con)
@@ -154,10 +124,7 @@ test_that("get_timecourse_backgrounds returns timecourse genetic backgrounds", {
 # ── get_de_results ────────────────────────────────────────────────────────────
 
 test_that("get_de_results returns correct columns and values", {
-  con <- DBI::dbConnect(
-    duckdb::duckdb(),
-    test_db_path()
-  )
+  con <- test_db_con()
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
   result <- get_de_results(con, "CCNA_00090")
@@ -179,10 +146,7 @@ test_that("get_de_results returns correct columns and values", {
 })
 
 test_that("get_de_results handles multiple gene_ids", {
-  con <- DBI::dbConnect(
-    duckdb::duckdb(),
-    test_db_path()
-  )
+  con <- test_db_con()
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
   result <- get_de_results(con, c("CCNA_00090", "CCNA_00446"))
@@ -194,10 +158,7 @@ test_that("get_de_results handles multiple gene_ids", {
 # ── get_de_data_types ─────────────────────────────────────────────────────────
 
 test_that("get_de_data_types returns data types for de_comparison experiments", {
-  con <- DBI::dbConnect(
-    duckdb::duckdb(),
-    test_db_path()
-  )
+  con <- test_db_con()
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
   result <- get_de_data_types(con)
@@ -209,10 +170,7 @@ test_that("get_de_data_types returns data types for de_comparison experiments", 
 # ── get_de_results_for_heatmap ────────────────────────────────────────────────
 
 test_that("get_de_results_for_heatmap returns correct columns with no filter", {
-  con <- DBI::dbConnect(
-    duckdb::duckdb(),
-    test_db_path()
-  )
+  con <- test_db_con()
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
   result <- get_de_results_for_heatmap(con, c("CCNA_00090", "CCNA_00446"))
@@ -233,10 +191,7 @@ test_that("get_de_results_for_heatmap returns correct columns with no filter", {
 })
 
 test_that("get_de_results_for_heatmap filters by data_type", {
-  con <- DBI::dbConnect(
-    duckdb::duckdb(),
-    test_db_path()
-  )
+  con <- test_db_con()
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
   result <- get_de_results_for_heatmap(
@@ -259,10 +214,7 @@ test_that("get_de_results_for_heatmap filters by data_type", {
 # ── stubs ─────────────────────────────────────────────────────────────────────
 
 test_that("get_fitness_data returns empty data frame with correct columns", {
-  con <- DBI::dbConnect(
-    duckdb::duckdb(),
-    test_db_path()
-  )
+  con <- test_db_con()
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
   result <- get_fitness_data(con, "CCNA_00090")
@@ -272,10 +224,7 @@ test_that("get_fitness_data returns empty data frame with correct columns", {
 })
 
 test_that("get_localization_data returns empty data frame with correct columns", {
-  con <- DBI::dbConnect(
-    duckdb::duckdb(),
-    test_db_path()
-  )
+  con <- test_db_con()
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
   result <- get_localization_data(con, "CCNA_00090")

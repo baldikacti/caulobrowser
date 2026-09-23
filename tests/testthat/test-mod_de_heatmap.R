@@ -18,18 +18,12 @@ testServer(
   args = list(
     gene_results = shiny::reactive(
       search_genes(
-        DBI::dbConnect(
-          duckdb::duckdb(),
-          test_db_path()
-        ),
+        test_db_con(),
         "CCNA_01248"
       )
     ),
     dtype_filter = c("rnaseq"),
-    db_con = shiny::reactiveVal(DBI::dbConnect(
-      duckdb::duckdb(),
-      test_db_path()
-    ))
+    db_con = shiny::reactiveVal(test_db_con())
   ),
   {
     session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
@@ -54,18 +48,12 @@ testServer(
   args = list(
     gene_results = shiny::reactive(
       search_genes(
-        DBI::dbConnect(
-          duckdb::duckdb(),
-          test_db_path()
-        ),
+        test_db_con(),
         "CCNA_00090"
       )
     ),
     dtype_filter = c("rnaseq"),
-    db_con = shiny::reactiveVal(DBI::dbConnect(
-      duckdb::duckdb(),
-      test_db_path()
-    ))
+    db_con = shiny::reactiveVal(test_db_con())
   ),
   {
     session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
@@ -80,18 +68,12 @@ testServer(
   args = list(
     gene_results = shiny::reactive(
       search_genes(
-        DBI::dbConnect(
-          duckdb::duckdb(),
-          test_db_path()
-        ),
+        test_db_con(),
         "CCNA_00090"
       )
     ),
     dtype_filter = c("not_a_data_type"),
-    db_con = shiny::reactiveVal(DBI::dbConnect(
-      duckdb::duckdb(),
-      test_db_path()
-    ))
+    db_con = shiny::reactiveVal(test_db_con())
   ),
   {
     session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
@@ -106,18 +88,12 @@ testServer(
   args = list(
     gene_results = shiny::reactive(
       search_genes(
-        DBI::dbConnect(
-          duckdb::duckdb(),
-          test_db_path()
-        ),
+        test_db_con(),
         "notAGene"
       )
     ),
     dtype_filter = c("rnaseq"),
-    db_con = shiny::reactiveVal(DBI::dbConnect(
-      duckdb::duckdb(),
-      test_db_path()
-    ))
+    db_con = shiny::reactiveVal(test_db_con())
   ),
   {
     session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
@@ -131,18 +107,12 @@ testServer(
   args = list(
     gene_results = shiny::reactive(
       search_genes(
-        DBI::dbConnect(
-          duckdb::duckdb(),
-          test_db_path()
-        ),
+        test_db_con(),
         "CCNA_00090"
       )
     ),
     dtype_filter = c("rnaseq"),
-    db_con = shiny::reactiveVal(DBI::dbConnect(
-      duckdb::duckdb(),
-      test_db_path()
-    ))
+    db_con = shiny::reactiveVal(test_db_con())
   ),
   {
     session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
@@ -156,18 +126,12 @@ testServer(
   args = list(
     gene_results = shiny::reactive(
       search_genes(
-        DBI::dbConnect(
-          duckdb::duckdb(),
-          test_db_path()
-        ),
+        test_db_con(),
         "CCNA_01248"
       )
     ),
     dtype_filter = c("not_a_data_type"),
-    db_con = shiny::reactiveVal(DBI::dbConnect(
-      duckdb::duckdb(),
-      test_db_path()
-    ))
+    db_con = shiny::reactiveVal(test_db_con())
   ),
   {
     session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
