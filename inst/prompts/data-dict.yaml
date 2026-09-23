@@ -1,0 +1,419 @@
+version: "0.2.0"
+
+name: caulobrowser
+description: >-
+  CauloBrowser is a curated systems biology resource for Caulobacter crescentus
+  NA1000, a gram-negative model organism used to study bacterial cell
+  differentiation, the cell cycle, and gene regulation. The database integrates
+  genome annotations with high-throughput experimental datasets: RNA-seq and
+  microarray transcriptomics, Tn-seq fitness screens, ribosome profiling, and
+  quantitative proteomics. Genes are identified by CCNA_XXXXX NA1000 locus tags
+  (`gene_id`), which is the key used to join every gene-level table. Users often
+  refer to genes by short name (e.g. ftsZ, ctrA) or by the legacy CB15 CC_XXXX
+  tag, so look genes up via `genes.gene_name` or `genes.cc_tag` and join on
+  `gene_id`.
+
+tables:
+  genes:
+    description: >-
+      Gene annotations. One row per gene in the NA1000 genome. Many annotation
+      columns are free text imported from NCBI/UniProt and are NULL when
+      unavailable; use ILIKE for keyword searches on text columns.
+    columns:
+      - name: gene_id
+        type: string
+        constraints: [primary_key]
+        description: >-
+          CCNA_XXXXX NA1000 locus tag (e.g. `CCNA_02623`). Joins to
+          `de_results.gene_id` and `timecourse_expression.gene_id`.
+      - name: cc_tag
+        type: string
+        description: >-
+          Legacy CB15 locus tag in CC_XXXX format (e.g. `CC_2540`), used in
+          older literature. NULL for genes without a CB15 equivalent.
+      - name: gene_name
+        type: string
+        description: >-
+          Short gene name (e.g. `ftsZ`, `dnaA`, `ctrA`). Contains the CCNA locus
+          tag when the gene has no short name. Case-sensitive; prefer ILIKE or
+          lower() when matching user input.
+      - name: uniprot_id
+        type: string
+        description: UniProt accession of the encoded protein.
+      - name: start_pos
+        type: number
+        units: bp
+        description: Start position on the NA1000 chromosome (1-based, inclusive).
+      - name: end_pos
+        type: number
+        units: bp
+        description: End position on the NA1000 chromosome (1-based, inclusive).
+      - name: strand
+        type: enum
+        values: ["+", "-"]
+        description: Genomic strand, `+` (forward) or `-` (reverse).
+      - name: length
+        type: string
+        description: >-
+          Protein length stored as text with units (e.g. `508 a.a.`). To compare
+          numerically, cast the leading number, e.g.
+          `TRY_CAST(split_part(length, ' ', 1) AS INTEGER)`.
+      - name: mass
+        type: string
+        description: >-
+          Predicted protein mass stored as text with units (e.g. `54.207 kDa`).
+          To compare numerically, use
+          `TRY_CAST(split_part(mass, ' ', 1) AS DOUBLE)`.
+      - name: copynumber_lifetime_min
+        type: number(quantity)
+        units: minutes
+        description: Transcription rate in minutes, M2G medium (quantitative proteomics).
+      - name: copynumber
+        type: number(quantity)
+        description: mRNA copy number per cell, M2G medium (quantitative proteomics).
+      - name: translated_prot_ave
+        type: number(quantity)
+        description: Average number of protein molecules translated per cell, M2G medium.
+      - name: mrna_halflife
+        type: number(quantity)
+        units: minutes
+        description: mRNA half-life.
+      - name: gene_biotype
+        type: enum
+        description: >-
+          Gene class, e.g. `protein_coding`, `tRNA`, `rRNA`, `ncRNA`,
+          `antisense_RNA`, `tmRNA`, `SRP_RNA`, `RNase_P_RNA`. NULL when unknown.
+      - name: product
+        type: string
+        description: Short functional product description (e.g. `cell division protein FtsZ`).
+      - name: description
+        type: string
+        description: Longer functional description of the gene or protein.
+      - name: protein_names
+        type: string
+        description: Full protein name(s) from UniProt, including alternative names.
+      - name: function_cc
+        type: string
+        description: Curated function comment from UniProt.
+      - name: protein_families
+        type: string
+        description: Protein family or superfamily classification.
+      - name: essential
+        type: string
+        description: >-
+          Free-text essentiality / phenotype notes with literature citations, not
+          a clean flag. NULL when nothing is known. Genes essential by Tn-seq
+          contain the phrase `gene is essential`, so filter with
+          `essential ILIKE '%gene is essential%'`. Some entries also note
+          conflicting evidence (e.g. "evidence that this gene is not essential").
+      - name: Dbxref
+        type: string
+        description: Cross-references to external databases.
+      - name: existence_ncbi
+        type: string
+        description: >-
+          Free-text protein/transcript existence evidence notes from NCBI
+          (e.g. `LC-MS`, `Ribosome profiling`, often with citations).
+      - name: existence_uniprot
+        type: enum
+        values:
+          - Evidence at protein level
+          - Evidence at transcript level
+          - Inferred from homology
+          - Predicted
+        description: UniProt protein existence evidence level. NULL when unavailable.
+      - name: COG
+        type: string
+        description: COG (Clusters of Orthologous Groups) identifier.
+      - name: COGFun
+        type: string
+        description: >-
+          COG functional category letter code(s); multiple letters may be
+          concatenated (e.g. `TK`), so match with LIKE '%D%'. See the glossary
+          for letter meanings.
+      - name: COGDesc
+        type: string
+        description: Full description of the COG functional category.
+      - name: TIGRFam
+        type: string
+        description: TIGRFAM family identifier(s).
+      - name: TIGRRoles
+        type: string
+        description: TIGRFAM role classification.
+      - name: GO
+        type: string
+        description: >-
+          Semicolon-separated Gene Ontology term IDs only (e.g.
+          `GO:0051258;GO:0005737`); term names are not stored.
+      - name: KEGG
+        type: string
+        description: >-
+          Comma-separated KEGG pathway identifiers for C. crescentus NA1000
+          (e.g. `ccs02020,ccs04112`).
+      - name: activity_regulation
+        type: string
+        description: Regulatory information from UniProt (inhibitors, activators, etc.).
+      - name: rhea_id
+        type: string
+        description: Rhea biochemical reaction ID(s) for enzyme-catalyzed reactions.
+      - name: interacts
+        type: string
+        description: Known protein-protein interaction partners from UniProt.
+      - name: subcellular_location_cc
+        type: string
+        description: >-
+          Subcellular localization from UniProt (e.g. `Cell membrane`,
+          `Cytoplasm`, `Cell pole`). Free text; match with ILIKE.
+      - name: ptm
+        type: string
+        description: Post-translational modification annotations.
+      - name: pubmed_id
+        type: string
+        description: PubMed IDs of relevant publications.
+      - name: doi
+        type: string
+        description: DOI(s) of relevant publications.
+      - name: EMBL
+        type: string
+        description: EMBL/GenBank nucleotide accession.
+      - name: protein_id
+        type: string
+        description: NCBI protein accession.
+      - name: PDB
+        type: string
+        description: Protein Data Bank IDs of experimentally solved structures.
+      - name: SMR
+        type: string
+        description: SWISS-MODEL Repository homology model IDs.
+      - name: sequence_similarities
+        type: string
+        description: Sequence similarity annotations from UniProt.
+      - name: protein_sequence
+        type: string
+        description: Full amino acid sequence (single-letter code). Avoid selecting unless asked.
+
+  experiments:
+    description: >-
+      Experiment metadata. One row per experiment. `experiment_class` decides
+      where the data lives: `de_comparison` experiments have rows in
+      `de_results`; `timecourse` experiments have rows in
+      `timecourse_expression` and `experiment_conditions`.
+    columns:
+      - name: experiment_id
+        type: string
+        constraints: [primary_key]
+        description: Unique experiment identifier.
+      - name: display_label
+        type: string
+        description: Human-readable experiment name shown in the app. Prefer this when presenting experiments.
+      - name: experiment_class
+        type: enum
+        values: [de_comparison, timecourse]
+        description: >-
+          `de_comparison` = one condition compared against a reference
+          (data in `de_results`); `timecourse` = expression measured across
+          ordered timepoints/conditions (data in `timecourse_expression`).
+      - name: data_type
+        type: enum
+        description: >-
+          Data modality, e.g. `rnaseq` (RNA-seq), `microarray`, `tnseq`
+          (Tn-seq fitness), `ribosome_profiling`, `proteomics`.
+      - name: strain
+        type: string
+        description: Bacterial strain used (e.g. `NA1000`).
+      - name: genetic_background
+        type: string
+        description: >-
+          Genetic background of the tested cells, e.g. `wildtype` or a mutant
+          such as `cckA(ts) ΔntrC`.
+      - name: treatment
+        type: string
+        description: >-
+          Treatment or condition applied (e.g. `heat`, a carbon/nitrogen source,
+          an antibiotic). Free text; match with ILIKE.
+      - name: treatment_level
+        type: string
+        description: Dose or intensity of the treatment.
+      - name: growth_phase
+        type: string
+        description: Growth phase at sampling (e.g. `mid-log`, `stationary`).
+      - name: media
+        type: string
+        description: >-
+          Growth medium (e.g. `PYE` = peptone yeast extract rich medium,
+          `M2G` = minimal glucose medium), possibly with additives.
+      - name: ref_strain
+        type: string
+        description: Strain of the reference/control condition for fold-change calculation.
+      - name: ref_treatment
+        type: string
+        description: Treatment of the reference/control condition.
+      - name: ref_treatment_level
+        type: string
+        description: Treatment dose/level of the reference/control condition.
+      - name: ref_growth_phase
+        type: string
+        description: Growth phase of the reference/control condition.
+      - name: ref_media
+        type: string
+        description: Growth medium of the reference/control condition.
+      - name: stat_method
+        type: enum
+        values: [padj, t-statistic]
+        description: >-
+          Statistical method for the experiment's differential analysis:
+          `padj` (adjusted p-value stored in `de_results.stat_value`) or
+          `t-statistic` (Tn-seq; the statistic is currently not stored, so
+          `stat_value` is NULL for these experiments). NULL when no statistic
+          is available.
+      - name: lab_group
+        type: string
+        description: Lab or research group that produced the data (e.g. `arkin_deutschbauer`, `Crosson`).
+      - name: doi
+        type: string
+        description: DOI of the publication reporting the experiment.
+      - name: geo_id
+        type: string
+        description: GEO or other repository accession for the raw data.
+      - name: notes
+        type: string
+        description: Additional notes about the experiment.
+      - name: date_added
+        type: string
+        description: Date (YYYY-MM-DD, stored as text) the experiment was added to the database.
+
+  experiment_conditions:
+    description: >-
+      Timepoints/conditions within a timecourse experiment. One row per
+      condition per experiment.
+    columns:
+      - name: experiment_id
+        type: string
+        constraints: [primary_key, foreign_key]
+        description: References experiments.experiment_id.
+      - name: condition_label
+        type: string
+        constraints: [primary_key]
+        description: Condition identifier (e.g. `30 min`), matching timecourse_expression.condition_label.
+      - name: condition_order
+        type: number
+        description: >-
+          Display order of the condition. Always ORDER BY this (not by
+          condition_label, which sorts incorrectly as text).
+      - name: condition_value
+        type: number
+        description: Numeric value of the condition (e.g. `30` for a 30-minute timepoint).
+      - name: condition_units
+        type: string
+        description: Units for condition_value (e.g. `minutes`).
+      - name: display_label
+        type: string
+        description: Human-readable condition label for plots and tables.
+
+  de_results:
+    description: >-
+      Differential expression / fitness results for `de_comparison`
+      experiments. One row per gene per experiment (large table, over one
+      million rows; always filter or aggregate). The reference condition is
+      described by the `ref_*` columns of `experiments`.
+    columns:
+      - name: gene_id
+        type: string
+        constraints: [primary_key, foreign_key]
+        description: References genes.gene_id.
+      - name: experiment_id
+        type: string
+        constraints: [primary_key, foreign_key]
+        description: References experiments.experiment_id.
+      - name: log2fc
+        type: number(quantity)
+        description: >-
+          Log2 fold-change of the experimental vs. reference condition.
+          For expression data, positive = upregulated, negative =
+          downregulated. For Tn-seq, it is the fitness score: negative =
+          fitness defect, positive = fitness advantage.
+      - name: stat_value
+        type: number
+        description: >-
+          Adjusted p-value (0-1, smaller = more significant; filter e.g.
+          `stat_value < 0.05`). Only populated for experiments with
+          `experiments.stat_method = 'padj'` (RNA-seq); NULL for all other
+          experiments, so a significance filter silently drops them — for
+          Tn-seq and microarray data, rank or threshold on `log2fc` instead.
+
+  timecourse_expression:
+    description: >-
+      Expression values for `timecourse` experiments (e.g. cell-cycle
+      synchrony). One row per gene per experiment per condition.
+    columns:
+      - name: gene_id
+        type: string
+        constraints: [primary_key, foreign_key]
+        description: References genes.gene_id.
+      - name: experiment_id
+        type: string
+        constraints: [primary_key, foreign_key]
+        description: References experiments.experiment_id.
+      - name: condition_label
+        type: string
+        constraints: [primary_key, foreign_key]
+        description: References experiment_conditions.condition_label (together with experiment_id).
+      - name: expression_value
+        type: number(quantity)
+        description: >-
+          Normalized expression value. Units depend on `experiments.data_type`
+          (e.g. TPM for RNA-seq); do not compare absolute values across
+          experiments.
+
+relationships:
+  - description: Each differential result belongs to one gene.
+    cardinality: many-to-one
+    join: de_results.gene_id = genes.gene_id
+  - description: Each differential result belongs to one experiment.
+    cardinality: many-to-one
+    join: de_results.experiment_id = experiments.experiment_id
+  - description: Each timecourse value belongs to one gene.
+    cardinality: many-to-one
+    join: timecourse_expression.gene_id = genes.gene_id
+  - description: Each timecourse value belongs to one experiment.
+    cardinality: many-to-one
+    join: timecourse_expression.experiment_id = experiments.experiment_id
+  - description: >-
+      Each timecourse value belongs to one condition; join on both columns and
+      ORDER BY experiment_conditions.condition_order.
+    cardinality: many-to-one
+    join: >-
+      timecourse_expression.experiment_id = experiment_conditions.experiment_id
+      AND timecourse_expression.condition_label = experiment_conditions.condition_label
+  - description: Each condition belongs to one timecourse experiment.
+    cardinality: many-to-one
+    join: experiment_conditions.experiment_id = experiments.experiment_id
+
+glossary:
+  NA1000: >-
+    Caulobacter crescentus strain whose genome annotation is used throughout
+    the database (CCNA_XXXXX locus tags).
+  CB15: Parent C. crescentus strain; its legacy CC_XXXX locus tags are in genes.cc_tag.
+  locus tag: Systematic gene identifier; CCNA_XXXXX for NA1000 (genes.gene_id), CC_XXXX for CB15 (genes.cc_tag).
+  Tn-seq: >-
+    Transposon sequencing fitness screen (data_type `tnseq`). log2fc is a gene
+    fitness score; strongly negative values indicate the gene is important for
+    growth in that condition.
+  essential gene: >-
+    A gene required for growth; identify with
+    genes.essential ILIKE '%gene is essential%'.
+  upregulated: Positive log2fc in de_results (for expression data types).
+  downregulated: Negative log2fc in de_results (for expression data types).
+  significant: >-
+    de_results.stat_value < 0.05 (adjusted p-value); only available for
+    experiments with experiments.stat_method = 'padj'.
+  PYE: Peptone yeast extract, a rich growth medium.
+  M2G: Minimal M2 salts medium with glucose.
+  COG categories: >-
+    COGFun letters — J translation; K transcription; L replication/repair;
+    D cell division; M cell wall/envelope; N motility; O chaperones/protein
+    turnover; P inorganic ion transport; Q secondary metabolism; T signal
+    transduction; U intracellular trafficking/secretion; C energy production;
+    E amino acid metabolism; F nucleotide metabolism; G carbohydrate
+    metabolism; H coenzyme metabolism; I lipid metabolism; R general function
+    prediction; S function unknown.

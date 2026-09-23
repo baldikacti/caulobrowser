@@ -11,30 +11,46 @@ caulochat_greeting_html <- function() {
     paste(collapse = "\n")
 }
 
+#' Tables exposed to the chat; must match the keys under `tables:` in
+#' `inst/prompts/data-dict.yaml`.
+#' @noRd
+caulochat_tables <- c(
+  "genes",
+  "experiments",
+  "experiment_conditions",
+  "de_results",
+  "timecourse_expression"
+)
+
 #' Return the process-level QueryChat singleton, creating it on first call.
+#'
+#' `$server(data_source = )` only registers a single table per session, so
+#' the tables are registered here up front on a dedicated read-only
+#' connection that lives for the life of the process (querychat never
+#' disconnects a caller-supplied connection).
 #' @noRd
 make_caulochat_qc <- function() {
   if (is.null(.qc_cache$qc)) {
-    .qc_cache$qc <- querychat::QueryChat$new(
-      NULL,
-      "genes",
-      client = ellmer::chat_anthropic(
-        model = "claude-sonnet-4-6",
-        base_url = "https://thekeymaker.umass.edu/v1"
+    .qc_cache$con <- get_db_connection()
+    qc <- querychat::QueryChat$new(
+      .qc_cache$con,
+      caulochat_tables[[1]],
+      client = ellmer::chat_openai_compatible(
+        model = "qwen3-8-27b",
+        base_url = "https://litellm.harmonyhpc.io/v1"
       ),
-      data_description = readLines(
-        system.file("prompts", "data_description.md", package = "caulobrowser"),
-        warn = FALSE
-      ) |>
-        paste(collapse = "\n"),
-      prompt_template = readLines(
-        system.file("prompts", "query.md", package = "caulobrowser"),
-        warn = FALSE
-      ) |>
-        paste(collapse = "\n"),
+      data_dict = system.file(
+        "prompts",
+        "data-dict.yaml",
+        package = "caulobrowser"
+      ),
+      extra_instructions = "Always update the dashboard with the relevant information.",
       greeting = caulochat_greeting_html(),
-      tools = c("filter", "query", "visualize")
+      tools = c("filter", "query", "visualize"),
+      cleanup = FALSE
     )
+    qc$add_tables(.qc_cache$con, caulochat_tables[-1])
+    .qc_cache$qc <- qc
   }
   .qc_cache$qc
 }
@@ -122,56 +138,49 @@ mod_caulochat_ui <- function(id) {
 #' caulochat Server Functions
 #'
 #' @noRd
-mod_caulochat_server <- function(id, db_con) {
+mod_caulochat_server <- function(id) {
   moduleServer(id, function(input, output, session) {
-    qc_state <- shiny::reactiveVal(NULL)
+    qc_vals <- make_caulochat_qc()$server()
 
-    shiny::observeEvent(
-      db_con(),
-      {
-        qc_vals <- .qc_cache$qc$server(data_source = db_con())
-        qc_state(qc_vals)
-        output$dt <- reactable::renderReactable(
-          reactable::reactable(
-            qc_vals$df(),
-            searchable = TRUE,
-            striped = TRUE,
-            highlight = TRUE,
-            compact = TRUE,
-            defaultColDef = reactable::colDef(
-              maxWidth = 400,
-              html = TRUE,
-              cell = reactable::JS(
-                "function(cellInfo) {
-                  var val = cellInfo.value == null ? '' : String(cellInfo.value);
-                  var esc = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');
-                  return '<span data-bs-toggle=\"tooltip\" data-bs-title=\"' + esc + '\" ' +
-                    'style=\"display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:default;\">' +
-                    esc + '</span>';
-                }"
-              )
-            ),
-            theme = reactable::reactableTheme(
-              style = list(fontSize = "0.85rem")
-            )
+    # Multi-table: show whichever table the chat last filtered
+    # (genes until the first filter).
+    current_table <- shiny::reactive({
+      qc_vals$table(qc_vals$current_table() %||% caulochat_tables[[1]])
+    })
+
+    output$dt <- reactable::renderReactable(
+      reactable::reactable(
+        current_table()$df(),
+        searchable = TRUE,
+        striped = TRUE,
+        highlight = TRUE,
+        compact = TRUE,
+        defaultColDef = reactable::colDef(
+          maxWidth = 400,
+          html = TRUE,
+          cell = reactable::JS(
+            "function(cellInfo) {
+              var val = cellInfo.value == null ? '' : String(cellInfo.value);
+              var esc = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');
+              return '<span data-bs-toggle=\"tooltip\" data-bs-title=\"' + esc + '\" ' +
+                'style=\"display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:default;\">' +
+                esc + '</span>';
+            }"
           )
+        ),
+        theme = reactable::reactableTheme(
+          style = list(fontSize = "0.85rem")
         )
-        output$sql <- shiny::renderText(qc_vals$sql() %||% "")
-      },
-      ignoreNULL = TRUE,
-      once = TRUE
+      )
     )
+    output$sql <- shiny::renderText(current_table()$sql() %||% "")
 
     output$download_transcript <- shiny::downloadHandler(
       filename = function() {
-        qc_vals <- qc_state()
-        chat_export_filename(
-          title = if (!is.null(qc_vals)) qc_vals$title() %||% NULL else NULL
-        )
+        chat_export_filename(title = current_table()$title())
       },
       content = function(file) {
-        qc_vals <- qc_state()
-        turns <- if (!is.null(qc_vals) && !is.null(qc_vals$client)) {
+        turns <- if (!is.null(qc_vals$client)) {
           qc_vals$client$get_turns()
         } else {
           list()
@@ -179,7 +188,7 @@ mod_caulochat_server <- function(id, db_con) {
         transcript <- format_chat_transcript(
           turns = turns,
           greeting = caulochat_greeting_html(),
-          title = if (!is.null(qc_vals)) qc_vals$title() %||% NULL else NULL
+          title = current_table()$title()
         )
         writeLines(transcript, file, useBytes = TRUE)
       }
