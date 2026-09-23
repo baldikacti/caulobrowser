@@ -23,11 +23,6 @@ caulochat_tables <- c(
 )
 
 #' Return the process-level QueryChat singleton, creating it on first call.
-#'
-#' `$server(data_source = )` only registers a single table per session, so
-#' the tables are registered here up front on a dedicated read-only
-#' connection that lives for the life of the process (querychat never
-#' disconnects a caller-supplied connection).
 #' @noRd
 make_caulochat_qc <- function() {
   if (is.null(.qc_cache$qc)) {
@@ -67,72 +62,32 @@ make_caulochat_qc <- function() {
 mod_caulochat_ui <- function(id) {
   ns <- NS(id)
   qc <- make_caulochat_qc()
-  bslib::page_sidebar(
-    title = "Caulo Chat",
-    shiny::tags$style(
-      "
-      .caulochat-bs-tt .tooltip-inner {
-        font-size: 0.9rem;
-        max-width: 450px;
-        text-align: left;
-        white-space: pre-wrap;
-        word-break: break-word;
-        line-height: 1.45;
-      }
-    "
+  # Chat-first layout: the same pieces as querychat's
+  tagList(qc$ui(
+    id = ns(qc$id),
+    drawer = shinychat::chat_drawer(
+      bslib::card(
+        full_screen = TRUE,
+        bslib::card_header(
+          shiny::textOutput(ns("results_title"), inline = TRUE)
+        ),
+        reactable::reactableOutput(ns("dt")),
+        bslib::card_footer(shiny::verbatimTextOutput(ns("sql")))
+      ),
+      title = "Results",
+      open = FALSE,
+      width = "calc(min(clamp(360px, 55vw, 720px), 100%))"
     ),
-    shiny::tags$script(shiny::HTML(
-      "
-      (function () {
-        function debounce(fn, ms) {
-          var t;
-          return function () { clearTimeout(t); t = setTimeout(fn, ms); };
-        }
-        function initTooltips() {
-          if (typeof bootstrap === 'undefined') return;
-          document.querySelectorAll('[data-bs-toggle=\"tooltip\"]:not(.tt-ready)').forEach(function (el) {
-            el.classList.add('tt-ready');
-            new bootstrap.Tooltip(el, {
-              trigger: 'hover',
-              boundary: 'window',
-              customClass: 'caulochat-bs-tt',
-              title: function () {
-                return this.scrollWidth > this.clientWidth
-                  ? this.getAttribute('data-bs-title')
-                  : '';
-              }
-            });
-          });
-        }
-        new MutationObserver(debounce(initTooltips, 150))
-          .observe(document.documentElement, { childList: true, subtree: true });
-      })();
-    "
-    )),
-    sidebar = qc$sidebar(
+    # Transcript export; /handoff (built in) exports the results instead.
+    toolbar_input = bslib::toolbar(
       shiny::downloadButton(
         ns("download_transcript"),
         label = "Download chat",
         icon = shiny::icon("download"),
-        class = "btn-sm btn-outline-secondary w-100 mb-2"
-      ),
-      width = 600,
-      id = ns(qc$id)
-    ),
-    bslib::card(
-      full_screen = TRUE,
-      bslib::card_header("Results"),
-      reactable::reactableOutput(ns("dt"))
-    ),
-    bslib::card(
-      fill = FALSE,
-      max_height = "200px",
-      bslib::card_header("SQL Query"),
-      bslib::card_body(
-        shiny::verbatimTextOutput(ns("sql"))
+        class = "btn-sm btn-outline-secondary"
       )
     )
-  )
+  ))
 }
 
 #' caulochat Server Functions
@@ -140,12 +95,25 @@ mod_caulochat_ui <- function(id) {
 #' @noRd
 mod_caulochat_server <- function(id) {
   moduleServer(id, function(input, output, session) {
-    qc_vals <- make_caulochat_qc()$server()
+    qc <- make_caulochat_qc()
+    qc_vals <- qc$server()
 
     # Multi-table: show whichever table the chat last filtered
     # (genes until the first filter).
-    current_table <- shiny::reactive({
-      qc_vals$table(qc_vals$current_table() %||% caulochat_tables[[1]])
+    current_table_name <- shiny::reactive({
+      qc_vals$current_table() %||% caulochat_tables[[1]]
+    })
+    current_table <- shiny::reactive(qc_vals$table(current_table_name()))
+
+    # Open the results drawer whenever the chat filters a table.
+    shiny::observe({
+      if (shiny::isTruthy(current_table()$sql())) {
+        shinychat::chat_drawer_show(paste0(qc$id, "-chat"))
+      }
+    })
+
+    output$results_title <- shiny::renderText({
+      current_table()$title() %||% current_table_name()
     })
 
     output$dt <- reactable::renderReactable(
@@ -155,6 +123,7 @@ mod_caulochat_server <- function(id) {
         striped = TRUE,
         highlight = TRUE,
         compact = TRUE,
+        # Truncate long cells; the full value shows on hover via `title`.
         defaultColDef = reactable::colDef(
           maxWidth = 400,
           html = TRUE,
@@ -162,8 +131,8 @@ mod_caulochat_server <- function(id) {
             "function(cellInfo) {
               var val = cellInfo.value == null ? '' : String(cellInfo.value);
               var esc = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');
-              return '<span data-bs-toggle=\"tooltip\" data-bs-title=\"' + esc + '\" ' +
-                'style=\"display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:default;\">' +
+              return '<span title=\"' + esc + '\" ' +
+                'style=\"display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;\">' +
                 esc + '</span>';
             }"
           )
