@@ -1,3 +1,15 @@
+# caulobrowser 0.11.0
+
+- Moves CauloChat to a chat-first interface and enables queries across
+- Changes caulochat AI model to locally hosted `qwen3-8-27b` that is hosted on the Harmony cluster.
+  multiple database tables (`querychat` >= 0.4.0, `shinychat` >= 0.5.0).
+- Updates the Gene Viewer to the new JBrowseR API (`JBrowseR` >= 0.13.0,
+  installed from `gmod/JBrowseR`).
+- Adds a Development Team section to the About page and README.
+- Updates the Docker base image to R 4.6.1.
+- Minor conviniece improvements to `justfile`.
+- Fixes test suite errors and warnings.
+
 # caulobrowser 0.10.0
 
 - Adds `microarray` experiments to expression heatmaps.
