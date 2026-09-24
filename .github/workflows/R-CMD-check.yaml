@@ -46,6 +46,9 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
+          # P3M's macOS binaries (e.g. gdtools, via ggiraph) link against
+          # XQuartz's /opt/X11 libraries, which the runners lack.
+          use-public-rspm: ${{ runner.os != 'macOS' }}
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
