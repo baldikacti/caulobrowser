@@ -1,6 +1,7 @@
 # https://just.systems
 
 version := `Rscript -e "cat(read.dcf('DESCRIPTION')[,'Version'])"`
+r_version := `Rscript -e "cat(renv::lockfile_read()\$R\$Version)"`
 
 # Clean deployments
 clean:
@@ -22,15 +23,15 @@ check:
 
 # Run Unit tests
 test:
-    Rscript -e "devtools::test()"
+    Rscript -e "devtools::test(reporter = 'summary')"
 
 # Build base docker container
 build_docker_base:
-    docker build --platform linux/arm64 -f Dockerfile_base -t baldikacti/caulobrowser_base:latest .
+    docker build --platform linux/arm64,linux/amd64 --build-arg R_VERSION={{r_version}} -f Dockerfile_base -t baldikacti/caulobrowser_base:latest .
 
 # Build runtime docker container
 build_docker_runtime arg: build_r
-    docker build --platform linux/arm64 --build-arg BASE_IMAGE={{arg}} -f Dockerfile -t baldikacti/caulobrowser:latest -t baldikacti/caulobrowser:{{version}} .
+    docker build --platform linux/arm64,linux/amd64 --build-arg BASE_IMAGE={{arg}} -f Dockerfile -t baldikacti/caulobrowser:latest -t baldikacti/caulobrowser:{{version}} .
 
 # Push the docker container to DockerHub
 push_docker:

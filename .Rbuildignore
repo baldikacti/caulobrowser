@@ -30,3 +30,4 @@ deploy/
 ^\.vscode$
 ^\.covrignore$
 ^\.Rprofile$
+.shinychat/

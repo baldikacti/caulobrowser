@@ -1,10 +1,10 @@
 #' Render a single `ellmer::Content` item as markdown for the transcript
 #'
 #' Text content passes through as-is. The querychat tool calls that drive the
-#' Results/SQL Query cards (`querychat_update_dashboard`, `querychat_visualize`)
+#' Results drawer (`querychat_update_dashboard`, `querychat_visualize`)
 #' are rendered as a titled SQL/ggsql code block so the query behind an answer
 #' is preserved in the export. Tool results and any other content types are
-#' dropped (their effect is already visible in the Results/SQL Query cards).
+#' dropped (their effect is already visible in the Results drawer).
 #'
 #' @param item an `ellmer::Content` object
 #' @return character scalar, possibly `""`

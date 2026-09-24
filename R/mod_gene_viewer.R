@@ -28,41 +28,61 @@ mod_gene_viewer_server <- function(
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    theme <- JBrowseR::theme("#5da8a3", "#333")
-
     jb_config <- shiny::reactive({
       con <- db_con()
       shiny::req(con)
 
       jbrowser_meta <- get_gene_viewer_metadata(con)
       tracks_df <- jbrowser_meta$tracks
+      # text_index is (ix, ixx, meta.json, assembly name)
+      ix <- jbrowser_meta$text_index
+      assembly_name <- ix[[4]]
 
-      assembly <- JBrowseR::assembly(jbrowser_meta$assembly, bgzip = TRUE)
-      gff_index <- do.call(
-        JBrowseR::text_index,
-        as.list(jbrowser_meta$text_index)
+      assembly <- list(name = assembly_name, uri = jbrowser_meta$assembly)
+
+      text_search <- list(
+        type = "TrixTextSearchAdapter",
+        textSearchAdapterId = paste0(assembly_name, "-index"),
+        assemblyNames = list(assembly_name),
+        ixFilePath = list(uri = ix[[1]]),
+        ixxFilePath = list(uri = ix[[2]]),
+        metaFilePath = list(uri = ix[[3]])
       )
 
-      annotations_tracks <- lapply(
-        subset(tracks_df, track_type == "feature")$https_paths,
-        \(path) JBrowseR::track_feature(path, assembly)
-      )
-      wiggle_tracks <- lapply(
-        subset(tracks_df, track_type == "wiggle")$https_paths,
-        \(path) JBrowseR::track_wiggle(path, assembly)
+      tracks <- Map(
+        \(id, type, path) {
+          list(
+            type = if (type == "feature") {
+              "FeatureTrack"
+            } else {
+              "QuantitativeTrack"
+            },
+            trackId = id,
+            name = id,
+            assemblyNames = list(assembly_name),
+            adapter = list(
+              type = if (type == "feature") {
+                "Gff3TabixAdapter"
+              } else {
+                "BigWigAdapter"
+              },
+              uri = path
+            )
+          )
+        },
+        tracks_df$experiment_id,
+        tracks_df$track_type,
+        tracks_df$https_paths
       )
 
       list(
         assembly = assembly,
-        tracks = do.call(
-          JBrowseR::tracks,
-          c(annotations_tracks, wiggle_tracks)
-        ),
-        gff_index = gff_index,
-        default_session = JBrowseR::default_session(
-          assembly,
-          unlist(annotations_tracks),
-          display_assembly = FALSE
+        tracks = unname(tracks),
+        text_search = text_search,
+        # Only the annotation tracks open by default; the wiggle tracks are
+        # available from the track selector.
+        default_tracks = as.list(
+          tracks_df$experiment_id[tracks_df$track_type == "feature"]
         )
       )
     })
@@ -79,14 +99,35 @@ mod_gene_viewer_server <- function(
     output$browserOutput <- JBrowseR::renderJBrowseR({
       cfg <- jb_config()
       JBrowseR::JBrowseR(
-        "View",
         assembly = cfg$assembly,
         tracks = cfg$tracks,
-        text_index = cfg$gff_index,
-        location = effective_location(),
-        defaultSession = cfg$default_session,
-        theme = theme
+        aggregateTextSearchAdapters = list(cfg$text_search),
+        session = list(
+          name = "CauloBrowser",
+          view = list(
+            id = "linearGenomeView",
+            type = "LinearGenomeView",
+            launch = list(
+              assembly = cfg$assembly$name,
+              loc = shiny::isolate(effective_location()),
+              tracks = cfg$default_tracks
+            )
+          )
+        )
+        # configuration = list(theme = list(palette = list(
+        #   primary = list(main = "#5da8a3"),
+        #   secondary = list(main = "#333")
+        # )))
       )
     })
+
+    shiny::observeEvent(
+      effective_location(),
+      JBrowseR::update_jbrowse(
+        "browserOutput",
+        location = effective_location()
+      ),
+      ignoreInit = TRUE
+    )
   })
 }

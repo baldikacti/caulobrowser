@@ -9,3 +9,13 @@ test_db_path <- function() {
   )
   path
 }
+
+# Read-only connection to the test database, matching how the app connects.
+# `shared_home` is set to silence warning messages in test suite
+test_db_con <- function() {
+  DBI::dbConnect(
+    duckdb::duckdb(shared_home = FALSE),
+    test_db_path(),
+    read_only = TRUE
+  )
+}

@@ -19,14 +19,15 @@ Imports:
     glue,
     golem,
     htmltools,
-    JBrowseR,
+    JBrowseR (>= 0.13.0),
     jsonlite,
     magick,
-    querychat,
+    querychat (>= 0.4.0),
     reactable,
     rsvg,
     scales,
     shiny,
+    shinychat (>= 0.5.0),
     stats,
     V8
 Suggests: 
@@ -37,12 +38,15 @@ Suggests:
     roxygen2,
     spelling,
     testthat (>= 3.0.0),
-    usethis
+    usethis,
+    yaml
 VignetteBuilder: 
     knitr
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-US
 LazyData: true
 Depends: R (>= 4.1.0)
+Remotes:
+    gmod/JBrowseR

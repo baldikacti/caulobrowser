@@ -18,10 +18,7 @@ testServer(
   args = list(
     gene_results = shiny::reactive(
       search_genes(
-        DBI::dbConnect(
-          duckdb::duckdb(),
-          test_db_path()
-        ),
+        test_db_con(),
         "CCNA_01248"
       )
     ),
@@ -41,10 +38,7 @@ testServer(
   args = list(
     gene_results = shiny::reactive(
       search_genes(
-        DBI::dbConnect(
-          duckdb::duckdb(),
-          test_db_path()
-        ),
+        test_db_con(),
         "CCNA_01248"
       )
     ),
@@ -64,10 +58,7 @@ testServer(
   args = list(
     gene_results = shiny::reactive(
       search_genes(
-        DBI::dbConnect(
-          duckdb::duckdb(),
-          test_db_path()
-        ),
+        test_db_con(),
         "CCNA_00090,CCNA_01248"
       )
     ),
@@ -87,10 +78,7 @@ testServer(
   args = list(
     gene_results = shiny::reactive(
       search_genes(
-        DBI::dbConnect(
-          duckdb::duckdb(),
-          test_db_path()
-        ),
+        test_db_con(),
         "ctrA"
       )
     ),
@@ -107,10 +95,7 @@ testServer(
   args = list(
     gene_results = shiny::reactive(
       search_genes(
-        DBI::dbConnect(
-          duckdb::duckdb(),
-          test_db_path()
-        ),
+        test_db_con(),
         "ctrA"
       )
     ),

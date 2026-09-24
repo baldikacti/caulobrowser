@@ -18,17 +18,11 @@ testServer(
   args = list(
     gene_results = shiny::reactive(
       search_genes(
-        DBI::dbConnect(
-          duckdb::duckdb(),
-          test_db_path()
-        ),
+        test_db_con(),
         "CCNA_01248"
       )
     ),
-    db_con = shiny::reactiveVal(DBI::dbConnect(
-      duckdb::duckdb(),
-      test_db_path()
-    ))
+    db_con = shiny::reactiveVal(test_db_con())
   ),
   {
     pal <- color_palette()
@@ -44,17 +38,11 @@ testServer(
   args = list(
     gene_results = shiny::reactive(
       search_genes(
-        DBI::dbConnect(
-          duckdb::duckdb(),
-          test_db_path()
-        ),
+        test_db_con(),
         "CCNA_00090,CCNA_01248"
       )
     ),
-    db_con = shiny::reactiveVal(DBI::dbConnect(
-      duckdb::duckdb(),
-      test_db_path()
-    ))
+    db_con = shiny::reactiveVal(test_db_con())
   ),
   {
     pal <- color_palette()
@@ -70,17 +58,11 @@ testServer(
   args = list(
     gene_results = shiny::reactive(
       search_genes(
-        DBI::dbConnect(
-          duckdb::duckdb(),
-          test_db_path()
-        ),
+        test_db_con(),
         "CCNA_00090"
       )
     ),
-    db_con = shiny::reactiveVal(DBI::dbConnect(
-      duckdb::duckdb(),
-      test_db_path()
-    ))
+    db_con = shiny::reactiveVal(test_db_con())
   ),
   {
     session$setInputs(genetic_background = "wildtype")
@@ -98,17 +80,11 @@ testServer(
   args = list(
     gene_results = shiny::reactive(
       search_genes(
-        DBI::dbConnect(
-          duckdb::duckdb(),
-          test_db_path()
-        ),
+        test_db_con(),
         "CCNA_00090"
       )
     ),
-    db_con = shiny::reactiveVal(DBI::dbConnect(
-      duckdb::duckdb(),
-      test_db_path()
-    ))
+    db_con = shiny::reactiveVal(test_db_con())
   ),
   {
     session$setInputs(genetic_background = "not_a_background")
@@ -123,17 +99,11 @@ testServer(
   args = list(
     gene_results = shiny::reactive(
       search_genes(
-        DBI::dbConnect(
-          duckdb::duckdb(),
-          test_db_path()
-        ),
+        test_db_con(),
         "CCNA_00090,CCNA_01248"
       )
     ),
-    db_con = shiny::reactiveVal(DBI::dbConnect(
-      duckdb::duckdb(),
-      test_db_path()
-    ))
+    db_con = shiny::reactiveVal(test_db_con())
   ),
   {
     session$setInputs(genetic_background = "wildtype")
