@@ -1,3 +1,7 @@
+# caulobrowser 0.11.1
+
+- Fixes an issue where in the new DuckDB package the extensions are loaded in to TMP location.
+
 # caulobrowser 0.11.0
 
 - Moves CauloChat to a chat-first interface and enables queries across
