@@ -139,6 +139,29 @@ app_ui <- function(request) {
             shiny::tags$li("Chromosome methylation (SMRT sequencing)")
           ),
 
+          shiny::h4("Development Team"),
+          shiny::p(
+            "CauloBrowser is developed through a collaboration between:"
+          ),
+          shiny::tags$ul(
+            shiny::tags$li(
+              shiny::strong("Berent Aldikacti"),
+              ", Research Computing & Data, University of Massachusetts"
+            ),
+            shiny::tags$li(
+              shiny::strong("Peter Chien"),
+              ", Chien Lab, University of Massachusetts"
+            ),
+            shiny::tags$li(
+              shiny::strong("Jared Schrader"),
+              ", Schrader Lab, Indiana University"
+            ),
+            shiny::tags$li(
+              shiny::strong("Vincent Ayobami"),
+              ", Schrader Lab, Indiana University"
+            )
+          ),
+
           shiny::h4("References"),
           shiny::p(
             "Lasker, K., Schrader, J.M., Men, Y., Marshik, T., Dill, D.L.,",

@@ -65,7 +65,7 @@ The app can be launched with Docker without any other dependencies.
 ``` bash
 docker run --rm \
   -v ~/Downloads:/output \
-  baldikacti/caulobrowser:latest \
+  ghcr.io/baldikacti/caulobrowser:latest \
   pelican object get 'osdf:///unity-hpc/caulobrowser/caulobrowser.duckdb?directread' /output
 ```
 
@@ -77,7 +77,7 @@ docker run --rm \
 ``` bash
 docker run --rm -p 3838:3838 \
   -v ~/Downloads/caulobrowser.duckdb:/database/caulobrowser.duckdb \
-  baldikacti/caulobrowser:latest
+  ghcr.io/baldikacti/caulobrowser:latest
 ```
 
 > Open `http://localhost:3838` in your browser.
@@ -91,6 +91,16 @@ overview.
 
 See [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) for the full schema and
 index definitions.
+
+## Development Team
+
+CauloBrowser is developed through a collaboration between:
+
+- **Berent Aldikacti**, Research Computing & Data, University of
+  Massachusetts
+- **Peter Chien**, Chien Lab, University of Massachusetts
+- **Jared Schrader**, Schrader Lab, Indiana University
+- **Vincent Ayobami**, Schrader Lab, Indiana University
 
 ## References
 

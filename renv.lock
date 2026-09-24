@@ -63,7 +63,7 @@
     },
     "JBrowseR": {
       "Package": "JBrowseR",
-      "Version": "0.13.0",
+      "Version": "0.14.0",
       "Source": "GitHub",
       "Title": "An R Interface to the JBrowse 2 Genome Browser",
       "Authors@R": "c(person(given = \"Elliot\", family = \"Hershberg\", role = c(\"aut\"), email = \"eahershberg@gmail.com\", comment = c(ORCID = \"0000-0003-2068-3366\")), person(given = \"Colin\", family = \"Diesh\", role = c(\"aut\", \"cre\"), email = \"colin.diesh@gmail.com\", comment = c(ORCID = \"0000-0003-2629-7570\")), person(given = \"the JBrowse 2 Team\", role = c(\"aut\")))",
@@ -91,11 +91,11 @@
       "Author": "Elliot Hershberg [aut] (ORCID: <https://orcid.org/0000-0003-2068-3366>), Colin Diesh [aut, cre] (ORCID: <https://orcid.org/0000-0003-2629-7570>), the JBrowse 2 Team [aut]",
       "Maintainer": "Colin Diesh <colin.diesh@gmail.com>",
       "RemoteType": "github",
-      "RemoteHost": "api.github.com",
       "RemoteUsername": "gmod",
       "RemoteRepo": "JBrowseR",
       "RemoteRef": "main",
-      "RemoteSha": "8ba85f31096315992e8a146f62f1f2230240b56d"
+      "RemoteSha": "e87aed6abc4fff0ee7165d3a0a20e929777c0c3a",
+      "RemoteHost": "api.github.com"
     },
     "MASS": {
       "Package": "MASS",
