@@ -40,7 +40,9 @@ RUN R -e 'remotes::install_version("renv", version = "1.2.4")'
 COPY renv.lock renv.lock
 RUN --mount=type=cache,id=renv-cache,target=/root/.cache/R/renv R -e 'renv::restore()'
 # download duckdb extensions
-RUN R -q -e 'library(duckdb); \
+# Fixed DuckDB home so extensions installed at build time are found at runtime
+ENV DUCKDB_R_HOME=/opt/duckdb
+RUN mkdir -p $DUCKDB_R_HOME && R -q -e 'library(duckdb); \
   con <- dbConnect(duckdb()); \
   for (ext in c("json")) dbExecute(con, sprintf("INSTALL %s", ext)); \
   dbDisconnect(con, shutdown = TRUE)'
