@@ -3,8 +3,7 @@ FROM $BASE_IMAGE
 COPY renv.lock renv.lock
 RUN R -e 'options(renv.config.pak.enabled = FALSE);renv::restore()'
 COPY ./deploy/caulobrowser_*.tar.gz /app.tar.gz
-RUN R -e 'remotes::install_local("/app.tar.gz",upgrade="never")'
-RUN rm /app.tar.gz
+RUN R CMD INSTALL /app.tar.gz && rm /app.tar.gz
 EXPOSE 3838
 ENV CAULOBROWSER_DB_PATH=/database/caulobrowser.duckdb
 RUN mkdir /database
