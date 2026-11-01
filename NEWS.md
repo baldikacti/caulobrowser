@@ -1,3 +1,8 @@
+# caulobrowser 0.11.2
+
+- Patch the data-dict.yaml
+- Update R dependencies
+
 # caulobrowser 0.11.1
 
 - Fixes an issue where in the new DuckDB package the extensions are loaded in to TMP location.
