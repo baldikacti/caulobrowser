@@ -362,7 +362,7 @@ tables:
         type: number(quantity)
         description: >-
           Normalized expression value. Units depend on `experiments.data_type`
-          (e.g. TPM for RNA-seq); do not compare absolute values across
+          (e.g. RPKM for RNA-seq); do not compare absolute values across
           experiments.
 
 relationships:

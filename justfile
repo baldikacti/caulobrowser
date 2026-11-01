@@ -75,13 +75,13 @@ tag_release:
     if git rev-parse "$tag" >/dev/null 2>&1; then
         echo "Tag $tag already exists"; exit 1
     fi
-    msg=$(awk "/^# caulobrowser {{version}}/{found=1; next} found && /^# /{exit} found{print}" NEWS.md | sed '/^$/d')
+    msg=$(awk "/^# caulobrowser {{version}}/{found=1; next} found && /^# /{exit} found{print}" NEWS.md | sed '/./,$!d')
     if [ -z "$msg" ]; then
         echo "No NEWS.md entry found for {{version}}"; exit 1
     fi
-    git tag -a "$tag" -m "$msg"
+    git tag -a "$tag" --cleanup=verbatim -m "caulobrowser {{version}}" -m "$msg"
     git push origin "$tag"
 
 # Create a new release from the latest tag (Requires gh CLI)
 create_release:
-    gh release create v{{version}} --notes-from-tag
+    gh release create v{{version}} --title "v{{version}}" --notes-from-tag
