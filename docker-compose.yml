@@ -1,0 +1,31 @@
+# Local test setup: `just run_docker` (or `just run_docker --build`), which runs
+#   docker compose --env-file .env up
+# then open http://localhost:3838
+services:
+  caulobrowser:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: docker.io/baldikacti/caulobrowser:latest
+    ports:
+      - "3838:3838"
+    environment:
+      # API key for the CauloChat LLM endpoint
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    volumes:
+      - ${CAULOBROWSER_DB_PATH:?Set CAULOBROWSER_DB_PATH in .env to the host path of caulobrowser.duckdb}:/database/caulobrowser.duckdb:ro
+      # Persistent chat history,
+      - ./.shinychat:/home/caulobrowser/.shinychat
+    user: "2231:2231"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    cpus: 1
+    mem_limit: 8g
+    # Scratch space for HOME (~/.cache, ~/.config, ~/.local) and R's tempdir;
+    # not persisted. Only needed because of read_only.
+    tmpfs:
+      - /home/caulobrowser
+      - /tmp

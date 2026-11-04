@@ -8,3 +8,9 @@ manifest.json
 rsconnect/
 .Rproj.user
 .shinychat/
+.Renviron
+.rvenv/
+.rvenvlib/
+renv/
+deploy/
+.env

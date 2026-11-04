@@ -1,9 +1,6 @@
 # https://just.systems
 
 version := `Rscript -e "cat(read.dcf('DESCRIPTION')[,'Version'])"`
-r_version := `Rscript -e "cat(renv::lockfile_read()\$R\$Version)"`
-image := "ghcr.io/baldikacti/caulobrowser"
-base_image := "ghcr.io/baldikacti/caulobrowser-base"
 
 # Clean deployments
 clean:
@@ -27,25 +24,13 @@ check:
 test:
     Rscript -e "devtools::test(reporter = 'summary')"
 
-# Build base docker container
-build_docker_base:
-    docker build --platform linux/arm64,linux/amd64 --build-arg R_VERSION={{r_version}} -f Dockerfile_base -t {{base_image}}:latest .
+# Run the app locally with docker compose (extra flags pass through, e.g. --build)
+run_docker *args:
+    docker compose --env-file .env up {{args}}
 
-# Build runtime docker container
-build_docker_runtime arg: build_r
-    docker build --platform linux/arm64,linux/amd64 --build-arg BASE_IMAGE={{arg}} -f Dockerfile -t {{image}}:latest -t {{image}}:{{version}} .
-
-# Push the docker container to GHCR (requires `docker login ghcr.io`)
-push_docker:
-    docker push -a {{image}}
-
-# Runs the Caulobrowser app from docker
-run_docker database_path:
-    docker run \
-        --rm \
-        -p 3838:3838 \
-        -v {{database_path}}:/database/caulobrowser.duckdb \
-        {{image}}:{{version}}
+# Stop and remove the local docker compose containers
+stop_docker:
+    docker compose --env-file .env down
 
 # Bump version in DESCRIPTION and add a NEWS.md heading (major, minor, patch, dev)
 bump which="minor":

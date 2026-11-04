@@ -7,59 +7,26 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  BASE_IMAGE_NAME: ${{ github.repository_owner }}/caulobrowser-base
   IMAGE_NAME: ${{ github.repository }}
 
 
 jobs:
-  # ── Detect what changed so downstream jobs can gate themselves ───────────────
-  check-changes:
-    runs-on: ubuntu-latest
-    outputs:
-      base_changed: ${{ steps.check.outputs.base_changed }}
-      app_changed: ${{ steps.check.outputs.app_changed }}
-      r_version: ${{ steps.r-version.outputs.r_version }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - id: r-version
-        run: |
-          R_VERSION=$(jq -er '.R.Version' renv.lock)
-          echo "r_version=${R_VERSION}" >> $GITHUB_OUTPUT
-      - id: check
-        run: |
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || true)
-          if [ -z "$PREV_TAG" ]; then
-            echo "base_changed=true" >> $GITHUB_OUTPUT
-            echo "app_changed=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          changed=$(git diff --name-only "$PREV_TAG" HEAD)
-          if echo "$changed" | grep -qE '^(Dockerfile_base|renv\.lock)$'; then
-            echo "base_changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "base_changed=false" >> $GITHUB_OUTPUT
-          fi
-          if echo "$changed" | grep -qE '^(Dockerfile$|R/|app\.R$|DESCRIPTION$|NAMESPACE$|inst/|man/|tests/)'; then
-            echo "app_changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "app_changed=false" >> $GITHUB_OUTPUT
-          fi
-
-
-  # ── Native builds per platform (renv restore is slow under QEMU) ─────────────
-  build-base-amd64:
-    runs-on: ubuntu-24.04
-    needs: [check-changes]
-    if: needs.check-changes.outputs.base_changed == 'true'
+  # ── Native builds per platform (installing R packages is slow under QEMU) ────
+  build:
+    strategy:
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-24.04
+            arch: amd64
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
       packages: write
       id-token: write
-
-    outputs:
-      digest: ${{ steps.build-and-push.outputs.digest }}
 
     steps:
       - name: Checkout repository
@@ -75,67 +42,48 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push base image (amd64)
+      - name: Build and push image (${{ matrix.arch }})
         id: build-and-push
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
         with:
-          file: Dockerfile_base
-          platforms: linux/amd64
+          file: Dockerfile
+          platforms: ${{ matrix.platform }}
           context: .
-          build-args: R_VERSION=${{ needs.check-changes.outputs.r_version }}
-          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
-          cache-from: type=gha,scope=base-amd64
-          cache-to: type=gha,mode=max,scope=base-amd64
+          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.arch }}
 
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build-and-push.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
 
-  build-base-arm64:
-    runs-on: ubuntu-24.04-arm
-    needs: [check-changes]
-    if: needs.check-changes.outputs.base_changed == 'true'
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-
-    outputs:
-      digest: ${{ steps.build-and-push.outputs.digest }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@f95db51fddba0c2d1ec667646a06c2ce06100226 # v3.0.0
-
-      - name: Log into registry ${{ env.REGISTRY }}
-        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push base image (arm64)
-        id: build-and-push
-        uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
-        with:
-          file: Dockerfile_base
-          platforms: linux/arm64
-          context: .
-          build-args: R_VERSION=${{ needs.check-changes.outputs.r_version }}
-          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
-          cache-from: type=gha,scope=base-arm64
-          cache-to: type=gha,mode=max,scope=base-arm64
+          name: digest-${{ matrix.arch }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
 
 
-  merge-base:
+  merge:
     runs-on: ubuntu-latest
-    needs: [build-base-amd64, build-base-arm64]
+    needs: [build]
     permissions:
       contents: read
       packages: write
       id-token: write
 
     steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests
+          pattern: digest-*
+          merge-multiple: true
+
       - name: Install cosign
         uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 #v3.5.0
         with:
@@ -150,91 +98,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}
-          tags: |
-            type=raw,value=latest
-          flavor: |
-            latest=false
-
-      - name: Create and push multi-arch manifest
-        run: |
-          docker buildx imagetools create \
-            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}@${{ needs.build-base-amd64.outputs.digest }} \
-            ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}@${{ needs.build-base-arm64.outputs.digest }}
-
-      - name: Sign the published base image
-        run: |
-          DIGEST=$(docker buildx imagetools inspect \
-            "${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:latest" \
-            --format '{{.Manifest.Digest}}')
-          echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign --yes {}@${DIGEST}
-
-
-  # ── Runtime image: QEMU is fine — just copies a tarball onto the base ────────
-  build-runtime:
-    runs-on: ubuntu-latest
-    needs: [check-changes, merge-base]
-    # Run whenever the workflow triggers. If base changed, wait for it to finish
-    # successfully first; skip if the base build failed.
-    if: >
-      always() && (
-        needs.check-changes.outputs.base_changed == 'false' ||
-        needs.merge-base.result == 'success'
-      )
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up R
-        uses: r-lib/actions/setup-r@v2
-        with:
-          r-version: ${{ needs.check-changes.outputs.r_version }}
-      - name: Install build dependencies
-        run: |
-          R -e 'install.packages("pak")'
-          R -e 'pak::pkg_install(c("roxygen2", "knitr"))'
-      - name: Build R package
-        run: |
-          mkdir -p deploy
-          R CMD build .
-          mv caulobrowser_*.tar.gz deploy/
-
-      - name: Install cosign
-        uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 #v3.5.0
-        with:
-          cosign-release: 'v2.2.4'
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@f95db51fddba0c2d1ec667646a06c2ce06100226 # v3.0.0
-
-      - name: Log into registry ${{ env.REGISTRY }}
-        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Get base image digest
-        id: base-digest
-        run: |
-          DIGEST=$(docker buildx imagetools inspect \
-            "${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:latest" \
-            --format '{{.Manifest.Digest}}')
-          echo "digest=${DIGEST}" >> $GITHUB_OUTPUT
 
       - name: Get R package version
         id: pkg-version
@@ -251,22 +114,18 @@ jobs:
           flavor: |
             latest=false
 
-      - name: Build and push runtime image
-        id: build-and-push
-        uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
-        with:
-          file: Dockerfile
-          platforms: linux/amd64,linux/arm64
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: BASE_IMAGE=${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}@${{ steps.base-digest.outputs.digest }}
-          cache-from: type=gha,scope=runtime
-          cache-to: type=gha,mode=max,scope=runtime
+      - name: Create and push multi-arch manifest
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:%s ' *)
 
-      - name: Sign the published runtime image
+      - name: Sign the published image
         env:
           TAGS: ${{ steps.meta.outputs.tags }}
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+        run: |
+          DIGEST=$(docker buildx imagetools inspect \
+            "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.pkg-version.outputs.version }}" \
+            --format '{{.Manifest.Digest}}')
+          echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}

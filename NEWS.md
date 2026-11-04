@@ -1,3 +1,10 @@
+# caulobrowser 0.11.3
+
+- Update Downloads section
+- Adds a GitHub icon
+- Move the development dependency management to `rig`.
+- Unify the Dockerfiles
+
 # caulobrowser 0.11.2
 
 - Patch the data-dict.yaml
