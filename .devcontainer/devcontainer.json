@@ -1,0 +1,28 @@
+{
+  "name": "CauloBrowser",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "remoteUser": "coder",
+  "containerUser": "coder",
+  // Installs R (rig user mode, into HOME) and the locked R packages into .rvenv/lib
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  // CAULOBROWSER_DB_PATH and OPENAI_API_KEY are not set here
+  "forwardPorts": [3838],
+  "portsAttributes": {
+    "3838": {
+      "label": "CauloBrowser (options(shiny.port = 3838))"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "REditorSupport.r",
+        "Posit.air-vscode",
+        "ggsql.ggsql",
+        "Posit.shiny",
+        "nefrob.vscode-just-syntax"
+      ]
+    }
+  }
+}

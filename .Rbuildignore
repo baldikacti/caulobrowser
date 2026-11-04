@@ -33,3 +33,4 @@ deploy/
 .shinychat/
 ^\.env$
 ^\.Renviron$
+^\.devcontainer$
