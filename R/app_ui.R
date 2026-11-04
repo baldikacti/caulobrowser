@@ -194,12 +194,23 @@ app_ui <- function(request) {
 
           shiny::h2("Download Data"),
           shiny::p(
-            "Download genome-wide datasets in CSV format."
-          ),
-          shiny::p(
-            class = "text-muted",
-            "(Download functionality will be implemented in a future version.)"
+            "Instructions for downloading the full database are available in our ",
+            shiny::a(
+              "GitHub repository",
+              href = "https://github.com/baldikacti/caulobrowser#installation",
+              target = "_blank"
+            ),
+            "."
           )
+        )
+      ),
+      # ── Links ─────────────────────────────------───────────
+      bslib::nav_spacer(),
+      bslib::nav_item(
+        tags$a(
+          icon("github"),
+          href = "https://github.com/baldikacti/caulobrowser",
+          target = "_blank"
         )
       )
     )
