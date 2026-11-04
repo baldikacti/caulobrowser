@@ -19,7 +19,7 @@ Imports:
     glue,
     golem,
     htmltools,
-    JBrowseR (>= 0.13.0),
+    JBrowseR (>= 0.14.0),
     jsonlite,
     magick,
     querychat (>= 0.4.0),

@@ -1,0 +1,9 @@
+# Multi-architecture build, layered on top of docker-compose.yml:
+#   docker compose -f docker-compose.yml -f docker-compose.multiarch.yml build
+# Add --push to publish the image (set the image name to your registry first).
+services:
+  caulobrowser:
+    build:
+      platforms:
+        - linux/amd64
+        - linux/arm64

@@ -1,0 +1,78 @@
+[project]
+name = "caulobrowser"
+version = "0.11.2"
+type = "package"
+title = "CauloBrowser: A Systems Biology Resource for Caulobacter Crescentus"
+description = '''
+An interactive Shiny application for browsing and visualizing
+curated high-throughput experimental data for Caulobacter crescentus.
+Built with the golem framework.'''
+license = "MIT + file LICENSE"
+
+[[project.authors]]
+name = "Berent Aldikacti"
+email = "aldikactiberent@gmail.com"
+roles = [
+    "aut",
+    "cre",
+]
+
+[dependencies]
+DBI = "^1.0.0"
+R = ">= 4.1.0"
+V8 = "^8.0.0"
+bslib = "^0.12.0"
+config = "^0.3.2"
+duckdb = "^2.0.0"
+ellmer = "^0.5.0"
+ggiraph = "^0.9.0"
+ggplot2 = "^4.0.0"
+ggsql = "^0.5.0"
+glue = "^1.0.0"
+golem = "^1.0.0"
+htmltools = "^0.5.0"
+jsonlite = "^2.0.0"
+magick = "^2.0.0"
+querychat = "^0.4.0"
+reactable = "^0.4.0"
+rsvg = "^2.0.0"
+scales = "^1.0.0"
+shiny = "^1.0.0"
+shinychat = "^0.5.0"
+stats = "*"
+JBrowseR = { version = "^0.14.0", git = "https://github.com/gmod/JBrowseR.git", ref = "gmod/JBrowseR" }
+
+[dependency-groups.dev]
+covr = "*"
+devtools = "*"
+knitr = "*"
+pkgdown = "*"
+roxygen2 = "*"
+spelling = "*"
+testthat = ">= 3.0.0"
+usethis = "*"
+yaml = "*"
+attachment = "*"
+rmarkdown = "*"
+
+[build]
+lazy-data = true
+
+[config.roxygen2]
+version = "8.1.1"
+
+[config.testthat]
+edition = 3
+
+[description]
+Encoding = "UTF-8"
+Language = "en-US"
+VignetteBuilder = "knitr"
+
+[tool.rig]
+platforms = [
+    "aarch64-apple-darwin",
+    "x86_64-unknown-linux-gnu",
+    "aarch64-unknown-linux-gnu",
+    "source",
+]

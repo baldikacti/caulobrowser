@@ -2,6 +2,7 @@
 .Rhistory
 .Rprofile
 .Renviron
+.env
 .RData
 .DS_Store
 inst/doc
@@ -10,3 +11,10 @@ inst/doc
 deploy/
 test.R
 .shinychat/
+
+# rig rvenv start
+# Everything in .rvenv is machine-specific output of `rig proj sync`; it can
+# be deleted and rebuilt at any time. The committed rvenv shim package lives
+# in .rvenvlib instead.
+/.rvenv/
+# rig rvenv end
