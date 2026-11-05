@@ -1,4 +1,4 @@
-# caulobrowser (development version)
+# caulobrowser 0.12.0
 
 - CauloChat's LLM backend is now configurable with the `CAULOCHAT_PROVIDER`,
   `CAULOCHAT_MODEL`, `CAULOCHAT_BASE_URL` and `CAULOCHAT_API_KEY` env vars, or
