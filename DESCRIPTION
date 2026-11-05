@@ -29,7 +29,8 @@ Imports:
     shiny,
     shinychat (>= 0.5.0),
     stats,
-    V8
+    V8,
+    yaml
 Suggests: 
     covr,
     devtools,
@@ -39,7 +40,7 @@ Suggests:
     spelling,
     testthat (>= 3.0.0),
     usethis,
-    yaml
+    withr
 VignetteBuilder: 
     knitr
 Config/roxygen2/version: 8.1.1

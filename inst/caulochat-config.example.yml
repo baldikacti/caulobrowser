@@ -1,0 +1,46 @@
+# CauloChat LLM configuration
+#
+# Copy this file, keep ONE of the blocks below, and point the app at it:
+#   CAULOCHAT_CONFIG=/path/to/caulochat-config.yml
+#
+# Any of these env vars override the matching field in this file:
+#   CAULOCHAT_PROVIDER, CAULOCHAT_MODEL, CAULOCHAT_BASE_URL, CAULOCHAT_API_KEY
+#
+# Fields:
+#   provider     Suffix of an ellmer chat_*() function: openai_compatible,
+#                openai, anthropic, ollama, google_gemini, vllm, openrouter,
+#                groq, mistral, deepseek, azure_openai, aws_bedrock, ...
+#                Aliases: litellm (= openai_compatible), gemini, claude.
+#   model        Model name as the provider/gateway knows it.
+#   base_url     Endpoint URL. Required for openai_compatible and vllm;
+#                optional for most others.
+#   api_key_env  Name of the env var that holds the API key (preferred).
+#   api_key      The key itself. Works, but avoid committing it to a file.
+#   params       Optional ellmer::params() settings, e.g. temperature.
+#
+# Key lookup order: CAULOCHAT_API_KEY, then the env var named by api_key_env,
+# then api_key, then the provider's own default (OPENAI_API_KEY,
+# ANTHROPIC_API_KEY, GEMINI_API_KEY, ...).
+
+# --- LiteLLM (or any OpenAI-compatible gateway) ------------------------------
+provider: litellm
+model: qwen3-8-27b
+base_url: https://litellm.example.org/v1
+api_key_env: LITELLM_API_KEY
+params:
+  temperature: 0.2
+
+# --- Local Ollama (no key; from Docker use http://host.docker.internal:11434) -
+# provider: ollama
+# model: qwen3:8b
+# base_url: http://localhost:11434
+
+# --- Anthropic ---------------------------------------------------------------
+# provider: anthropic
+# model: claude-sonnet-5-5
+# api_key_env: ANTHROPIC_API_KEY
+
+# --- OpenAI ------------------------------------------------------------------
+# provider: openai
+# model: gpt-5
+# api_key_env: OPENAI_API_KEY

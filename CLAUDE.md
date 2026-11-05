@@ -84,3 +84,5 @@ Read the database schema from [here](DATABASE_SCHEMA.md).
 ### Configuration
 
 `inst/golem-config.yml` is read by `get_golem_config()` from `R/app_config.R`. The `default` block reads the database path from `CAULOBROWSER_DB_PATH` (no fallback); environment-specific overrides (`production`, etc.) can be added there.
+
+CauloChat's LLM backend is resolved in `R/fct_llm_config.R`. The `CAULOCHAT_PROVIDER`, `CAULOCHAT_MODEL`, `CAULOCHAT_BASE_URL` and `CAULOCHAT_API_KEY` env vars override the YAML file named by `CAULOCHAT_CONFIG` (template: `inst/caulochat-config.example.yml`). The provider is any `ellmer::chat_*()` suffix. With no provider set, the chat tab shows a "not configured" card. Tests use `local_caulochat_config()` / `local_caulochat_env()` from `tests/testthat/helper-caulochat.R`.

@@ -117,3 +117,13 @@ is_hdr <- function(cat) startsWith(cat, ".hdr.")
 #' @return The display label with the `".hdr."` prefix removed.
 #' @noRd
 hdr_label <- function(cat) sub("^\\.hdr\\.", "", cat)
+
+#' Return `x` as a single non-empty string, or NULL.
+#' @noRd
+nz_string <- function(x) {
+  if (is.null(x) || length(x) != 1 || is.na(x)) {
+    return(NULL)
+  }
+  x <- trimws(as.character(x))
+  if (nzchar(x)) x else NULL
+}
