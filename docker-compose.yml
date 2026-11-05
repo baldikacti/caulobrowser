@@ -10,10 +10,16 @@ services:
     ports:
       - "3838:3838"
     environment:
-      # API key for the CauloChat LLM endpoint
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      # CauloChat LLM backend (README: "Configuring CauloChat").
+      CAULOCHAT_PROVIDER: ${CAULOCHAT_PROVIDER:-}
+      CAULOCHAT_MODEL: ${CAULOCHAT_MODEL:-}
+      CAULOCHAT_BASE_URL: ${CAULOCHAT_BASE_URL:-}
+      CAULOCHAT_API_KEY: ${CAULOCHAT_API_KEY:-}
+      # Or use a YAML config file: uncomment the volume below and this line
+      # CAULOCHAT_CONFIG: /config/caulochat.yml
     volumes:
       - ${CAULOBROWSER_DB_PATH:?Set CAULOBROWSER_DB_PATH in .env to the host path of caulobrowser.duckdb}:/database/caulobrowser.duckdb:ro
+      # - ./caulochat.yml:/config/caulochat.yml:ro
       # Persistent chat history,
       - ./.shinychat:/home/caulobrowser/.shinychat
     user: "2231:2231"

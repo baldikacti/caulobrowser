@@ -23,28 +23,110 @@ caulochat_tables <- c(
 )
 
 #' Return the process-level QueryChat singleton, creating it on first call.
+#'
+#' The LLM client comes from [caulochat_llm_config()]. Returns NULL when no
+#' provider is configured or the client cannot be built; the reason is kept in
+#' `.qc_cache$status$reason`. Success and "not configured" are cached for the
+#' process; a build error (e.g. Ollama not running yet) is retried on the next
+#' call.
 #' @noRd
 make_caulochat_qc <- function() {
-  if (is.null(.qc_cache$qc)) {
-    qc <- querychat::QueryChat$new(
-      NULL,
-      client = ellmer::chat_openai_compatible(
-        model = "qwen3-8-27b",
-        base_url = "https://litellm.harmonyhpc.io/v1"
-      ),
-      data_dict = system.file(
-        "prompts",
-        "data-dict.yaml",
-        package = "caulobrowser"
-      ),
-      extra_instructions = "Always update the dashboard with the relevant information.",
-      greeting = caulochat_greeting_html(),
-      tools = c("filter", "query", "visualize"),
-      cleanup = FALSE
+  if (is.null(.qc_cache$status) || isTRUE(.qc_cache$status$retry)) {
+    status <- tryCatch(
+      {
+        cfg <- caulochat_llm_config()
+        client <- caulochat_build_client(cfg)
+        if (is.null(client)) {
+          list(
+            enabled = FALSE,
+            reason = "No LLM provider is configured."
+          )
+        } else {
+          .qc_cache$qc <- querychat::QueryChat$new(
+            NULL,
+            client = client,
+            data_dict = system.file(
+              "prompts",
+              "data-dict.yaml",
+              package = "caulobrowser"
+            ),
+            extra_instructions = "Always update the dashboard with the relevant information.",
+            greeting = caulochat_greeting_html(),
+            tools = c("filter", "query", "visualize"),
+            cleanup = FALSE
+          )
+          .qc_cache$model_info <- caulochat_model_info(client)
+          message("CauloChat: using ", caulochat_describe(cfg))
+          list(enabled = TRUE, reason = NULL)
+        }
+      },
+      error = function(e) {
+        list(enabled = FALSE, reason = conditionMessage(e), retry = TRUE)
+      }
     )
-    .qc_cache$qc <- qc
+    if (!status$enabled) {
+      message("CauloChat disabled: ", status$reason)
+    }
+    .qc_cache$status <- status
   }
   .qc_cache$qc
+}
+
+#' Clear the cached QueryChat, its status and its connection (for tests).
+#' @noRd
+caulochat_reset <- function() {
+  if (!is.null(.qc_cache$con)) {
+    try(close_db_connection(.qc_cache$con), silent = TRUE)
+  }
+  rm(list = ls(.qc_cache, all.names = TRUE), envir = .qc_cache)
+  invisible(NULL)
+}
+
+#' Small muted line under the chat input naming the model and provider.
+#' @noRd
+caulochat_model_footer <- function(info) {
+  if (is.null(info)) {
+    return(NULL)
+  }
+  shiny::div(
+    class = "caulochat-model text-muted small text-center mt-1",
+    shiny::icon("microchip"),
+    "Model: ",
+    shiny::strong(info$model),
+    paste0(" · Provider: ", info$provider)
+  )
+}
+
+#' Card shown in place of the chat when no LLM is available.
+#' @noRd
+caulochat_unavailable_ui <- function(reason) {
+  bslib::card(
+    class = "border-warning",
+    bslib::card_header(
+      shiny::icon("triangle-exclamation"),
+      "CauloChat is unavailable"
+    ),
+    bslib::card_body(
+      shiny::p(reason),
+      shiny::p(
+        "To enable it, set these environment variables (or point ",
+        shiny::code("CAULOCHAT_CONFIG"),
+        " to a YAML file with the same settings) and restart the app:"
+      ),
+      shiny::pre(paste(
+        "CAULOCHAT_PROVIDER=openai_compatible  # or ollama, anthropic, openai, litellm, ...",
+        "CAULOCHAT_MODEL=<model name>",
+        "CAULOCHAT_BASE_URL=<endpoint URL>     # gateways, Ollama, vLLM",
+        "CAULOCHAT_API_KEY=<key>               # not needed for Ollama",
+        sep = "\n"
+      )),
+      shiny::p(
+        "See the 'Configuring CauloChat' section of the README and ",
+        shiny::code("inst/caulochat-config.example.yml"),
+        "."
+      )
+    )
+  )
 }
 
 #' Register the chat tables on a dedicated read-only connection, once per
@@ -71,6 +153,9 @@ caulochat_register_tables <- function(qc) {
 mod_caulochat_ui <- function(id) {
   ns <- NS(id)
   qc <- make_caulochat_qc()
+  if (is.null(qc)) {
+    return(tagList(caulochat_unavailable_ui(.qc_cache$status$reason)))
+  }
   # Chat-first layout: the same pieces as querychat's
   tagList(qc$ui(
     id = ns(qc$id),
@@ -87,6 +172,8 @@ mod_caulochat_ui <- function(id) {
       open = FALSE,
       width = "calc(min(clamp(360px, 55vw, 720px), 100%))"
     ),
+    # Rendered directly under the chat input.
+    footer = caulochat_model_footer(.qc_cache$model_info),
     # Transcript export; /handoff (built in) exports the results instead.
     toolbar_input = bslib::toolbar(
       shiny::downloadButton(
@@ -105,6 +192,10 @@ mod_caulochat_ui <- function(id) {
 mod_caulochat_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     qc <- make_caulochat_qc()
+    # No LLM configured: the UI already explains why.
+    if (is.null(qc)) {
+      return(invisible(NULL))
+    }
     # Without a database there is nothing to chat about; app_server already
     # reports the database error to the user.
     registered <- tryCatch(

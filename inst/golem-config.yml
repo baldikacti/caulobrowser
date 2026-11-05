@@ -3,8 +3,10 @@ default:
   golem_version: 0.1.0
   app_prod: no
   db_path: !expr Sys.getenv("CAULOBROWSER_DB_PATH")
+  caulochat_config: !expr Sys.getenv("CAULOCHAT_CONFIG")
 production:
   app_prod: yes
   db_path: !expr Sys.getenv("CAULOBROWSER_DB_PATH")
+  caulochat_config: !expr Sys.getenv("CAULOCHAT_CONFIG")
 dev:
   golem_wd: !expr golem::pkg_path()

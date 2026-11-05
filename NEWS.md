@@ -1,3 +1,12 @@
+# caulobrowser 0.12.0
+
+- CauloChat's LLM backend is now configurable with the `CAULOCHAT_PROVIDER`,
+  `CAULOCHAT_MODEL`, `CAULOCHAT_BASE_URL` and `CAULOCHAT_API_KEY` env vars, or
+  a YAML file set by `CAULOCHAT_CONFIG`. Any ellmer provider works (LiteLLM and
+  other OpenAI-compatible gateways, Ollama, Anthropic, OpenAI, Gemini, …).
+- **Breaking:** the hardcoded LiteLLM endpoint is removed. CauloChat is
+  disabled, with setup instructions shown, until a provider is configured.
+
 # caulobrowser 0.11.3
 
 - Update Downloads section

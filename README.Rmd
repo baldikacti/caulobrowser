@@ -85,6 +85,53 @@ docker run --rm -p 3838:3838 \
 
 > Open `http://localhost:3838` in your browser.
 
+## Configuring CauloChat
+
+CauloChat, the AI chat tab, works with any LLM provider that
+[ellmer](https://ellmer.tidyverse.org) supports. Examples include a LiteLLM or other
+OpenAI-compatible gateway, local Ollama, Anthropic, OpenAI and Google Gemini.
+If no provider is configured, the tab shows setup instructions and the rest of the app works as normal.
+
+Set these environment variables, or put the same settings in a YAML file and point
+`CAULOCHAT_CONFIG` at it. An environment variable overrides the matching field in the file.
+
+| Variable             | Meaning                                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------------------------- |
+| `CAULOCHAT_PROVIDER` | `openai_compatible`, `ollama`, `anthropic`, `openai`, `google_gemini`, `vllm`, `openrouter`, … (any `ellmer::chat_*()` suffix). Aliases: `litellm`, `gemini`, `claude`. |
+| `CAULOCHAT_MODEL`    | Model name as the provider knows it                                                                       |
+| `CAULOCHAT_BASE_URL` | Endpoint URL; required for `openai_compatible`/`litellm` and `vllm`                                        |
+| `CAULOCHAT_API_KEY`  | API key. If unset, the provider's own variable is used (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, …)          |
+| `CAULOCHAT_CONFIG`   | Path to a YAML config file (see [`inst/caulochat-config.example.yml`](inst/caulochat-config.example.yml)) |
+
+Examples:
+
+```bash
+# LiteLLM (or any OpenAI-compatible gateway)
+CAULOCHAT_PROVIDER=litellm
+CAULOCHAT_MODEL=qwen3-8-27b
+CAULOCHAT_BASE_URL=https://litellm.example.org/v1
+CAULOCHAT_API_KEY=sk-...
+
+# Local Ollama (no key). From inside Docker use http://host.docker.internal:11434
+CAULOCHAT_PROVIDER=ollama
+CAULOCHAT_MODEL=qwen3:8b
+
+# Anthropic
+CAULOCHAT_PROVIDER=anthropic
+CAULOCHAT_MODEL=claude-sonnet-5-5
+CAULOCHAT_API_KEY=sk-ant-...
+
+# OpenAI
+CAULOCHAT_PROVIDER=openai
+CAULOCHAT_MODEL=gpt-5
+CAULOCHAT_API_KEY=sk-...
+```
+
+In a YAML file, use `api_key_env: MY_KEY_VAR` to name the variable that holds the key,
+so the key itself stays out of the file. With Docker, pass the variables with `-e`
+(or `--env-file`), or mount the YAML file read-only and set `CAULOCHAT_CONFIG` to its path in the container.
+The client is built once when the app starts, so restart the app after changing the settings.
+
 ## Project Structure
 
 See [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) for a full directory overview.
