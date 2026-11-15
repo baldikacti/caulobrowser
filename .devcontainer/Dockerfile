@@ -92,3 +92,5 @@ RUN .rvenv/bin/Rscript -e 'library(duckdb); \
       for (ext in c("json")) dbExecute(con, sprintf("INSTALL %s", ext)); \
       dbDisconnect(con, shutdown = TRUE)' \
  && find . -mindepth 1 -delete
+
+WORKDIR /home/coder

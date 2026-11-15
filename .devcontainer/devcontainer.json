@@ -1,6 +1,6 @@
 {
   "name": "Caulobrowser",
-  "image": "docker.io/baldikacti/caulobrowser-dev:latest",
+  "image": "docker.io/baldikacti/caulobrowser-dev:0.12.0",
   "remoteUser": "coder",
   "updateRemoteUserUID": false, // keep UID 1000 to match runAsUser
   // Mirror the cluster's restrictions locally
