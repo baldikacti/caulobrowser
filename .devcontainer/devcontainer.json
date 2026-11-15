@@ -1,27 +1,20 @@
 {
-  "name": "CauloBrowser",
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
+  "name": "R package",
+  "image": "docker.io/baldikacti/caulobrowser-dev:latest",
+  "workspaceFolder": "/workspace/caulobrowser",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace/caulobrowser,type=bind",
   "remoteUser": "coder",
-  "containerUser": "coder",
-  // Installs R (rig user mode, into HOME) and the locked R packages into .rvenv/lib
-  "postCreateCommand": "bash .devcontainer/post-create.sh",
-  // CAULOBROWSER_DB_PATH and OPENAI_API_KEY are not set here
-  "forwardPorts": [3838],
-  "portsAttributes": {
-    "3838": {
-      "label": "CauloBrowser (options(shiny.port = 3838))"
-    }
-  },
+  "updateRemoteUserUID": false, // keep UID 1000 to match runAsUser
+  // Mirror the cluster's restrictions locally
+  "runArgs": ["--read-only", "--cap-drop=ALL", "--security-opt=no-new-privileges"],
+  // Deps are in the image; this writes .rvenv/ and installs the package
+  "postCreateCommand": "rig proj sync --frozen",
   "customizations": {
     "vscode": {
       "extensions": [
         "REditorSupport.r",
         "Posit.air-vscode",
-        "ggsql.ggsql",
-        "Posit.shiny",
-        "nefrob.vscode-just-syntax"
+        "rust-lang.rust-analyzer"
       ]
     }
   }

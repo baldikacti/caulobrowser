@@ -1,9 +1,14 @@
-# Development image for CauloBrowser.
+# syntax=docker/dockerfile:1
 FROM ubuntu:24.04
-ENV DEBIAN_FRONTEND=noninteractive
-ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
-# Same system libraries as the production image, plus development tools
+ARG RIG_VERSION=0.11.1
+ARG RUST_TOOLCHAIN=stable
+ARG PROJECT_DIR=/workspace/caulobrowser
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 LC_ALL=C.UTF-8
+
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
     build-essential \
     ca-certificates \
@@ -33,15 +38,7 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
     libmagick++-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Rust, installed system-wide and writable by the dev user: ggsql has no Linux
-# binary and is compiled from source, and cargo writes to CARGO_HOME while building
-ENV RUSTUP_HOME=/usr/local/rustup CARGO_HOME=/usr/local/cargo
-ENV PATH="/usr/local/cargo/bin:${PATH}"
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
-    | sh -s -- -y --no-modify-path --profile minimal \
-    && chmod -R a+w "$RUSTUP_HOME" "$CARGO_HOME"
-
-# Pelican binary (arch from uname, so it works without BuildKit's TARGETARCH)
+# Install Pelican
 RUN case "$(uname -m)" in \
       x86_64) ARCH="x86_64" ;; \
       aarch64) ARCH="arm64" ;; \
@@ -50,15 +47,48 @@ RUN case "$(uname -m)" in \
     wget -O - "https://dl.pelicanplatform.org/latest/pelican_Linux_${ARCH}.tar.gz" \
     | tar zx -C /usr/local/bin/ --strip-components=1
 
-# rig in user mode
-COPY --from=ghcr.io/r-lib/rig/base:latest /rig /usr/local/bin/rig
-ENV RIG_MODE=user
+# rig binary: root-owned, read-only at runtime
+RUN curl -fsSL "https://github.com/r-lib/rig/releases/download/v${RIG_VERSION}/rig-linux-$(arch)-${RIG_VERSION}.tar.gz" \
+    | tar xz -C /usr/local
 
-# Non-root dev user, UID 1000 (replaces Ubuntu's default "ubuntu" user).
-ARG USERNAME=coder
-ARG USER_UID=1000
-RUN userdel --remove ubuntu 2>/dev/null || true \
-    && useradd --create-home --uid "$USER_UID" --user-group --shell /bin/bash "$USERNAME"
-# rig's quick links (R, Rscript), for processes that don't read shell startup files
-ENV PATH="/home/${USERNAME}/.local/bin:${PATH}"
-USER $USERNAME
+# Renames the ubuntu user
+RUN usermod -l coder -d /home/coder -m ubuntu \
+ && groupmod -n coder ubuntu \
+ && install -d -o coder -g coder /opt/r /opt/rust /opt/duckdb /workspaces "${PROJECT_DIR}"
+
+# R, Rust and DuckDB state live outside $HOME
+ENV RIG_MODE=user \
+    RIG_R_INSTALL_DIR=/opt/r/versions \
+    RIG_BINARY_DIR=/opt/r/bin \
+    RIG_PROJ_LIBRARY_ROOT=/opt/r/projects \
+    R_LIBS_USER=/opt/r/library/%v \
+    RUSTUP_HOME=/opt/rust/rustup \
+    CARGO_HOME=/opt/rust/cargo \
+    DUCKDB_R_HOME=/opt/duckdb \
+    SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt \
+    PATH=/opt/rust/cargo/bin:/opt/r/bin:${PATH}
+
+# --- user: everything below stays writable at runtime ---
+USER 1000:1000
+
+# Rust: rustup/cargo can add toolchains and crates later without root
+RUN curl -fsSL https://sh.rustup.rs | sh -s -- -y --no-modify-path \
+      --profile minimal --default-toolchain "${RUST_TOOLCHAIN}" \
+      -c rustfmt -c clippy -c rust-src
+
+# R + deps from rproj.lock (the lock pins the R version).
+# The package itself is installed at runtime, from the real checkout.
+WORKDIR ${PROJECT_DIR}
+COPY --chown=1000:1000 rproj.toml rproj.lock ./
+RUN rig proj sync --frozen --no-install-project \
+ && rig library add tools \
+ && rig pkg install -l tools devtools languageserver \
+ && rm -rf /tmp/rig-* ~/.cache
+
+# DuckDB extensions into $DUCKDB_R_HOME, matching the locked duckdb version.
+# Then leave PROJECT_DIR empty for the real checkout.
+RUN .rvenv/bin/Rscript -e 'library(duckdb); \
+      con <- dbConnect(duckdb()); \
+      for (ext in c("json")) dbExecute(con, sprintf("INSTALL %s", ext)); \
+      dbDisconnect(con, shutdown = TRUE)' \
+ && find . -mindepth 1 -delete

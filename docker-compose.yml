@@ -33,5 +33,4 @@ services:
     # Scratch space for HOME (~/.cache, ~/.config, ~/.local) and R's tempdir;
     # not persisted. Only needed because of read_only.
     tmpfs:
-      - /home/caulobrowser
       - /tmp
