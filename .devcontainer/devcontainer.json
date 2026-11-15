@@ -1,8 +1,6 @@
 {
-  "name": "R package",
+  "name": "Caulobrowser",
   "image": "docker.io/baldikacti/caulobrowser-dev:latest",
-  "workspaceFolder": "/workspace/caulobrowser",
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace/caulobrowser,type=bind",
   "remoteUser": "coder",
   "updateRemoteUserUID": false, // keep UID 1000 to match runAsUser
   // Mirror the cluster's restrictions locally
